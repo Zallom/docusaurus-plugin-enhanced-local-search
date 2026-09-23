@@ -1,6 +1,7 @@
 import MiniSearch, {type Query, type SearchResult} from 'minisearch';
 import type {Chunk, HitGroup, SearchHit, SearchIndexFile, SearchResponse} from '../types';
 import {createStemmer} from './stemmer';
+import {createWordSplitter, type WordSplitter} from './words';
 
 export interface EngineConfig {
   stopWords: string[];
@@ -46,21 +47,21 @@ interface SectionRecord {
   pin: number;
 }
 
-/** Minuscules sans accents : « Bannissement » et « bannissément » donnent le même terme. */
+/** Minuscules sans accents : « Bannissement » et « bannissément » donnent le même terme.
+ *  Seuls les accents latins, grecs et cyrilliques sont retirés : les signes du
+ *  japonais (dakuten) ou du hindi changent le sens et restent. */
 export function normalize(text: string): string {
-  return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC').toLowerCase();
 }
-
-const TOKEN_RE = /[\p{L}\p{N}]+(?:[-'’][\p{L}\p{N}]+)*/gu;
 
 /* Découpe en mots. Un mot composé est aussi indexé soudé : « anti-spam » donne
  * « anti », « spam » et « antispam », pour que les deux graphies se trouvent. */
-export function tokenize(text: string): string[] {
+export function tokenize(words: WordSplitter, text: string): string[] {
   const out: string[] = [];
-  for (const match of text.matchAll(TOKEN_RE)) {
-    const parts = match[0].split(/[-'’]/);
+  for (const {text: word} of words(text)) {
+    const parts = word.split(/[-'’]/);
     out.push(...parts);
-    if (parts.length > 1 && match[0].includes('-')) out.push(parts.join(''));
+    if (parts.length > 1 && word.includes('-')) out.push(parts.join(''));
   }
   return out;
 }
@@ -68,7 +69,7 @@ export function tokenize(text: string): string[] {
 type TermKey = (word: string) => string;
 
 /** Surligne dans `text` les mots dont la clé (forme normalisée, racine) fait partie de `terms`. */
-export function highlight(text: string, terms: Set<string>, key: TermKey = normalize): Chunk[] {
+export function highlight(words: WordSplitter, text: string, terms: Set<string>, key: TermKey = normalize): Chunk[] {
   const chunks: Chunk[] = [];
   let last = 0;
   const push = (slice: string, hl: boolean) => {
@@ -77,9 +78,7 @@ export function highlight(text: string, terms: Set<string>, key: TermKey = norma
     if (prev && prev.hl === hl) prev.text += slice;
     else chunks.push({text: slice, hl});
   };
-  for (const match of text.matchAll(TOKEN_RE)) {
-    const token = match[0];
-    const start = match.index ?? 0;
+  for (const {text: token, index: start} of words(text)) {
     const joined = key(token.replace(/[-'’]/g, ''));
     if (token.includes('-') && terms.has(joined)) {
       push(text.slice(last, start), false);
@@ -103,12 +102,18 @@ export function highlight(text: string, terms: Set<string>, key: TermKey = norma
 }
 
 /** Extrait d'environ `max` caractères autour de la première correspondance. */
-export function snippet(text: string, terms: Set<string>, max = 160, key: TermKey = normalize): Chunk[] {
+export function snippet(
+  words: WordSplitter,
+  text: string,
+  terms: Set<string>,
+  max = 160,
+  key: TermKey = normalize,
+): Chunk[] {
   if (!text) return [];
   let pos = -1;
-  for (const match of text.matchAll(TOKEN_RE)) {
-    if (match[0].split(/[-'’]/).some((part) => terms.has(key(part)))) {
-      pos = match.index ?? 0;
+  for (const word of words(text)) {
+    if (word.text.split(/[-'’]/).some((part) => terms.has(key(part)))) {
+      pos = word.index;
       break;
     }
   }
@@ -121,7 +126,7 @@ export function snippet(text: string, terms: Set<string>, max = 160, key: TermKe
     const space = text.lastIndexOf(' ', end);
     if (space > start + max * 0.6) end = space;
   }
-  const chunks = highlight(text.slice(start, end).trim(), terms, key);
+  const chunks = highlight(words, text.slice(start, end).trim(), terms, key);
   if (start > 0) chunks.unshift({text: '… ', hl: false});
   if (end < text.length) chunks.push({text: ' …', hl: false});
   return chunks;
@@ -155,6 +160,8 @@ function matchLevel(indexTerm: string, group: string[]): number {
 export function createSearchEngine(index: SearchIndexFile, config: EngineConfig): SearchEngine {
   const stopWords = new Set(config.stopWords.map(normalize));
   const stem = createStemmer(config.locale ?? 'en', config.stemming !== false);
+  const segmentWords = createWordSplitter(config.locale ?? 'en');
+  const split = (text: string) => tokenize(segmentWords, text);
   /** Clé d'un mot : sans accents, en minuscules, ramené à sa racine. */
   const key = (word: string) => stem(normalize(word));
   const processTerm = (term: string): string | null => {
@@ -167,7 +174,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
   // Chaque groupe de synonymes : racine → liste des autres formes, déjà découpées.
   const synonyms = new Map<string, string[][]>();
   for (const group of config.synonyms) {
-    const forms = group.map((entry) => tokenize(entry).map(processTerm).filter((t): t is string => Boolean(t)));
+    const forms = group.map((entry) => split(entry).map(processTerm).filter((t): t is string => Boolean(t)));
     forms.forEach((form, i) => {
       if (form.length !== 1) return;
       const others = forms.filter((_, j) => j !== i && forms[j].length > 0);
@@ -223,7 +230,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
   const mini = new MiniSearch<SectionRecord>({
     fields: ['title', 'keywords', 'heading', 'content', 'context'],
     storeFields: [],
-    tokenize,
+    tokenize: split,
     processTerm: (term) => {
       const processed = processTerm(term);
       if (processed && !surface.has(processed)) surface.set(processed, term.toLowerCase());
@@ -284,7 +291,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
   function search(rawQuery: string): SearchResponse {
     const query = rawQuery.trim();
     const empty: SearchResponse = {query, groups: [], hits: [], suggestion: null, relaxed: false};
-    const rawTerms = tokenize(query).filter((t) => processTerm(t));
+    const rawTerms = split(query).filter((t) => processTerm(t));
     const terms = [...new Set(rawTerms.map(processTerm).filter((t): t is string => Boolean(t)))];
     if (!terms.length) return empty;
 
@@ -342,11 +349,11 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
       const matchedSet = new Set(matched.map(([term]) => term));
       let titleWords = 0;
       let covered = 0;
-      for (const word of (record.isPage ? record.pageTitle : record.heading).matchAll(TOKEN_RE)) {
-        const parts = word[0].split(/[-'’]/).map(processTerm).filter((part): part is string => Boolean(part));
+      for (const {text: word} of segmentWords(record.isPage ? record.pageTitle : record.heading)) {
+        const parts = word.split(/[-'’]/).map(processTerm).filter((part): part is string => Boolean(part));
         if (!parts.length) continue;
         titleWords += 1;
-        const joined = word[0].includes('-') ? processTerm(word[0].replace(/[-'’]/g, '')) : null;
+        const joined = word.includes('-') ? processTerm(word.replace(/[-'’]/g, '')) : null;
         if (parts.some((part) => matchedSet.has(part)) || (joined && matchedSet.has(joined))) covered += 1;
       }
       const precision = titleWords ? covered / titleWords : 0;
@@ -384,8 +391,8 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
         crumbs: record.isPage ? record.crumbs : [...record.crumbs, record.pageTitle],
         category: record.category,
         isPage: record.isPage,
-        titleChunks: highlight(record.isPage ? record.pageTitle : record.heading, matched, key),
-        snippet: snippet(record.content, matched, 160, key),
+        titleChunks: highlight(segmentWords, record.isPage ? record.pageTitle : record.heading, matched, key),
+        snippet: snippet(segmentWords, record.content, matched, 160, key),
         score: result.score,
       });
     }
