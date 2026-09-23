@@ -8,8 +8,15 @@ Local, Algolia-like search for Docusaurus v3. No external service, no API key, n
 - **Optional `/search` page**, with the query kept in the URL so searches can be shared.
 - **Smart without AI**: typo tolerance, prefix search while typing, synonyms, light stemming per language, stop words, accent-insensitive matching, and Algolia-style ranking.
 - **Deep links**: results point to the exact section (`/docs/page#heading`), not just the page.
+- **Custom entries**: add your own results (an invite link, a pricing page, a support server) or extra keywords on existing pages, translated per locale and promoted in the ranking.
 - **i18n**: one index per locale, UI translated in English, French, German, Spanish and Portuguese.
 - **Fully customizable**: every component can be swizzled, colors come from CSS variables that default to your Infima theme.
+
+## Requirements
+
+- Docusaurus 3
+- React 18 or 19
+- Node.js 18 or later
 
 ## Installation
 
@@ -193,6 +200,7 @@ plugins: [
 | `shortcuts` | `['mod+k', '/']` | Keyboard shortcuts. `mod` is ⌘ on macOS and Ctrl elsewhere. Shortcuts without modifier are ignored while typing in a field. |
 | `recentSearches` | `5` | Number of recent results kept in the browser. `0` disables them. |
 | `suggestions` | `[]` | `[{label, href}]` shown when the search field is empty. `label` can be a per-locale map. |
+| `customEntries` | `[]` | Results added by hand, or extra keywords on existing pages. See [Custom entries](#custom-entries). |
 | `searchPagePath` | `false` | Adds a search page at this path (for example `'search'`). |
 | `ignorePatterns` | `[]` | Regexes on page paths to exclude from the index. |
 | `contentSelectors` | `['.theme-doc-markdown', 'article .markdown', 'article', 'main']` | Where the page content is read, first match wins. |
@@ -203,6 +211,45 @@ plugins: [
 | `respectNoindex` | `true` | Skip pages with `<meta name="robots" content="noindex">`. |
 | `indexFileName` | `'search-index.json'` | Name of the generated index file. |
 | `storageKey` | `'local-search'` | Prefix of the keys stored in `localStorage`. |
+
+### Custom entries
+
+Some things people search for are not pages of your site: the link to install your product, a pricing page you do not index, your community server. `customEntries` adds them to the index, and can also teach the search new words for an existing page.
+
+```js
+customEntries: [
+  {
+    title: {en: 'Add the bot', fr: 'Ajouter le bot'},
+    url: {en: 'https://example.com/en/invite', fr: 'https://example.com/invite'},
+    description: {en: 'Invite the bot to your server.', fr: 'Invitez le bot sur votre serveur.'},
+    keywords: {en: ['invite', 'install'], fr: ['inviter', 'installer']},
+    category: {en: 'Quick links', fr: 'Liens rapides'},
+    priority: 2,
+  },
+  {
+    // Points to an indexed page: no new result, the page gets the keywords.
+    title: 'Installation',
+    url: '/docs/setup',
+    keywords: ['getting started', 'onboarding'],
+  },
+],
+```
+
+With this configuration, typing "add" (or "ajouter" on the French site) lists "Add the bot" first.
+
+| Field | Type | Description |
+|---|---|---|
+| `title` | string or per-locale map | Title of the result. Required. |
+| `url` | string or per-locale map | Site path (`/docs/setup`, the locale prefix is added for you) or absolute URL. Absolute URLs open in a new tab. Required. |
+| `description` | string or per-locale map | Text shown under the title. |
+| `keywords` | `string[]` or `{locale: string[]}` | Extra words that find the entry. A plain list applies to every locale; with a map, a locale without a list gets none. |
+| `category` | string or per-locale map | Group of the result. Defaults to the category matching `url`, then `defaultCategory`. |
+| `priority` | `0` to `9`, default `1` | Ranks the entry above pages that match the query just as well. It never lifts an entry above a result matching more of the query words. |
+| `locales` | `string[]` | Locales where the entry exists. All by default. |
+
+When `url` is a page that is already indexed, no duplicate is created: the page gets the keywords (and the entry's title, if different) and the priority.
+
+Custom entries are added after `ignorePatterns` is applied, so they can point to pages you keep out of the index.
 
 ### Excluding content
 
@@ -272,12 +319,25 @@ Results are ranked criterion after criterion, like Algolia, rather than by a sin
 1. category priority, when set;
 2. number of query words found;
 3. words found without typos;
-4. where they are found: page title, then section heading, then text;
-5. exact words before prefixes and typos (synonyms count as exact);
-6. precision: a title fully covered by the query ranks above a longer one;
-7. a BM25 relevance score, only to break ties.
+4. `priority` of [custom entries](#custom-entries);
+5. where they are found: page title, then section heading, then text;
+6. exact words before prefixes and typos (synonyms count as exact);
+7. precision: a title fully covered by the query ranks above a longer one;
+8. a BM25 relevance score, only to break ties.
 
 When no page contains every word, the search falls back to pages containing most of them and says so. When nothing matches, it suggests the closest spelling found in your site.
+
+## TypeScript
+
+The package ships its types, including the `@theme/Search*` modules. Importing the options type in your config makes them available to the rest of your site, and checks your options:
+
+```ts
+import type {PluginOptions as SearchOptions} from 'docusaurus-plugin-enhanced-local-search';
+
+plugins: [
+  ['docusaurus-plugin-enhanced-local-search', {searchPagePath: 'search'} satisfies Partial<SearchOptions>],
+],
+```
 
 ## Limitations
 
@@ -285,6 +345,18 @@ When no page contains every word, the search falls back to pages containing most
 - The search is lexical: it matches words, their variants and your synonyms, not meaning.
 - Pages rendered only on the client (content fetched after load) are not indexed.
 
+## Development
+
+```bash
+npm install
+npm run build      # compiles the plugin to lib/
+npm run typecheck  # checks the plugin and the theme
+```
+
+The theme components (`theme/`) are shipped as TypeScript source and compiled by the Docusaurus site, so they stay swizzlable. To try a change, install the local folder in a Docusaurus site (`npm install ../docusaurus-plugin-enhanced-local-search`), then build and serve the site.
+
+Issues and pull requests are welcome on [GitHub](https://github.com/Zallom/docusaurus-plugin-enhanced-local-search).
+
 ## License
 
-MIT
+[MIT](./LICENSE)
