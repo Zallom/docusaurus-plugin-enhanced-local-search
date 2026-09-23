@@ -173,3 +173,25 @@ declare module '@theme/SearchBar' {
 
   export default function SearchBar(): ReactNode;
 }
+
+declare module '@theme/SearchHero' {
+  import type {ReactNode} from 'react';
+
+  export interface SearchHeroProps {
+    title?: ReactNode;
+    subtitle?: ReactNode;
+    placeholder?: string;
+    suggestions?: string[];
+    inline?: boolean;
+    syncUrl?: boolean;
+    initialQuery?: string;
+    className?: string;
+  }
+  export default function SearchHero(props: SearchHeroProps): ReactNode;
+}
+
+declare module '@theme/SearchPage' {
+  import type {ReactNode} from 'react';
+
+  export default function SearchPage(): ReactNode;
+}

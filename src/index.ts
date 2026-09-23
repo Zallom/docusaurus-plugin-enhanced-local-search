@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type {LoadContext, Plugin, SwizzleConfig} from '@docusaurus/types';
-import {buildIndex, type ResolvedCategory} from './indexer/build';
+import {buildIndex, joinUrl, type ResolvedCategory} from './indexer/build';
 import {DEFAULT_STOP_WORDS} from './stopwords';
 import type {LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
 
@@ -18,6 +18,8 @@ export function getSwizzleConfig(): SwizzleConfig {
     components: {
       SearchBar: {actions: safe, description: 'Barre de la navbar (élément de navbar `type: \'search\'`).'},
       SearchInput: {actions: safe, description: 'Mini barre à placer dans la navbar, le footer ou une page.'},
+      SearchHero: {actions: safe, description: 'Grande barre de recherche pour une page, façon ChatGPT.'},
+      SearchPage: {actions: safe, description: 'Page de recherche (option searchPagePath).'},
       SearchResult: {actions: safe, description: 'Une ligne de résultat (titre, fil d\'Ariane, extrait).'},
       SearchResults: {actions: safe, description: 'Liste des résultats groupés par catégorie.'},
       SearchModal: {actions: {eject: 'unsafe', wrap: 'safe'}, description: 'La fenêtre de recherche (Cmd+K).'},
@@ -116,6 +118,10 @@ export default function pluginLocalSearch(
         storageKey: options.storageKey,
       };
       actions.setGlobalData(globalData);
+
+      if (searchPagePath) {
+        actions.addRoute({path: joinUrl(baseUrl, searchPagePath), component: '@theme/SearchPage', exact: true});
+      }
     },
 
     async postBuild({outDir}) {
