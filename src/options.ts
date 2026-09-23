@@ -11,6 +11,7 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   respectNoindex: true,
   contentSelectors: ['.theme-doc-markdown', 'article .markdown', 'article', 'main'],
   excludeSelectors: [
+    '[data-search-ignore]',
     '.hash-link',
     'script',
     'style',
