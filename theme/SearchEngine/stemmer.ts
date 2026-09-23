@@ -51,7 +51,27 @@ const german: Stemmer = (word) => {
   return w;
 };
 
-const STEMMERS: Record<string, Stemmer> = {fr: french, en: english, es: iberian, pt: iberian, de: german};
+// Italien : voyelle finale (pluriels et genre : attivo, attiva, attivi).
+const italian: Stemmer = (word) => (word.length > 4 && /[aeio]$/.test(word) ? word.slice(0, -1) : word);
+
+// Néerlandais : pluriels en -en et -s.
+const dutch: Stemmer = (word) => {
+  if (word.length > 5 && word.endsWith('en')) return word.slice(0, -2);
+  if (word.length > 4 && /[^s]s$/.test(word)) return word.slice(0, -1);
+  return word;
+};
+
+// Les autres langues sont cherchées sans racinisation : préfixes et fautes de
+// frappe tolérées couvrent déjà une bonne partie des variantes.
+const STEMMERS: Record<string, Stemmer> = {
+  fr: french,
+  en: english,
+  es: iberian,
+  pt: iberian,
+  de: german,
+  it: italian,
+  nl: dutch,
+};
 
 export function createStemmer(locale: string, enabled = true): Stemmer {
   if (!enabled) return identity;
