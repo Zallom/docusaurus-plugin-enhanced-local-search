@@ -57,8 +57,12 @@ export default function SearchModal({initialQuery, revision, onClose}: SearchMod
     const input = inputRef.current;
     if (input) {
       input.focus();
-      const end = initialQuery.length;
-      requestAnimationFrame(() => input.setSelectionRange(end, end));
+      // Longueur lue au dernier moment : en frappe rapide, d'autres lettres
+      // sont peut-être déjà arrivées, le curseur doit rester à la fin.
+      requestAnimationFrame(() => {
+        const end = input.value.length;
+        input.setSelectionRange(end, end);
+      });
     }
   }, [revision]); // eslint-disable-line react-hooks/exhaustive-deps
 
