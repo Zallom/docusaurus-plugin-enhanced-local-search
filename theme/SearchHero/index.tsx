@@ -151,12 +151,18 @@ export default function SearchHero({
       results = (
         <>
           <p className={styles.count}>
-            <Translate
-              id="localSearch.page.count"
-              description="Number of results, {count} is a number"
-              values={{count: hits.length}}>
-              {'{count} results'}
-            </Translate>
+            {hits.length === 1 ? (
+              <Translate id="localSearch.page.countOne" description="Exactly one result">
+                1 result
+              </Translate>
+            ) : (
+              <Translate
+                id="localSearch.page.count"
+                description="Number of results, {count} is a number greater than one"
+                values={{count: hits.length}}>
+                {'{count} results'}
+              </Translate>
+            )}
           </p>
           {response.relaxed && (
             <p className={styles.notice}>

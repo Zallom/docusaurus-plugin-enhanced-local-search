@@ -3,6 +3,7 @@ import path from 'path';
 import type {LoadContext, Plugin, SwizzleConfig} from '@docusaurus/types';
 import {buildIndex, joinUrl, type ResolvedCategory} from './indexer/build';
 import {DEFAULT_STOP_WORDS} from './stopwords';
+import translations from './translations';
 import type {LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
 
 export {validateOptions} from './options';
@@ -61,6 +62,10 @@ export default function pluginLocalSearch(
 
     getTypeScriptThemePath() {
       return themePath;
+    },
+
+    getDefaultCodeTranslationMessages() {
+      return translations[locale] ?? translations[locale.split('-')[0]] ?? {};
     },
 
     getClientModules() {
