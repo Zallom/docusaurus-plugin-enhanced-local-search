@@ -1,5 +1,6 @@
 import React, {useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode} from 'react';
 import {useHistory, useLocation} from '@docusaurus/router';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Translate, {translate} from '@docusaurus/Translate';
 import useLocalSearch from '@theme/useLocalSearch';
 import SearchModalHost from '@theme/SearchModalHost';
@@ -61,6 +62,9 @@ export default function SearchHero({
     [inline, trimmed, status, search],
   );
   const hits = response?.hits ?? [];
+  // Formulaire GET classique (`/search?q=`) : il marche sans JavaScript et les
+  // navigateurs le reconnaissent comme une recherche.
+  const searchPageUrl = useBaseUrl(data.searchPagePath ?? '/');
   const idle = inline && showSuggestions && !trimmed ? data.suggestions : [];
   const targets = hits.length ? hits.map((hit) => hit.url) : idle.map((s) => s.href);
 
@@ -230,6 +234,8 @@ export default function SearchHero({
       <form
         className={styles.box}
         role="search"
+        method="get"
+        action={data.searchPagePath ? searchPageUrl : undefined}
         onSubmit={(event) => {
           event.preventDefault();
           submit(query);
@@ -239,6 +245,7 @@ export default function SearchHero({
           ref={inputRef}
           className={styles.input}
           type="search"
+          name="q"
           value={query}
           placeholder={label}
           aria-label={label}
