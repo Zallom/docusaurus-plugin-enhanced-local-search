@@ -6,6 +6,7 @@ import {applyCustomEntries, type ResolvedEntry} from './indexer/custom';
 import {DEFAULT_STOP_WORDS} from './stopwords';
 import translations, {DEFAULT_MESSAGES} from './translations';
 import {openSearchXml, searchActionJsonLd} from './seo';
+import {pickLocale} from './locales';
 import type {CustomEntryOption, LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
 
 export {validateOptions} from './options';
@@ -34,7 +35,7 @@ export function getSwizzleConfig(): SwizzleConfig {
 
 function resolveLocalized(value: LocalizedString, locale: string, defaultLocale: string): string {
   if (typeof value === 'string') return value;
-  return value[locale] ?? value[locale.split('-')[0]] ?? value[defaultLocale] ?? Object.values(value)[0] ?? '';
+  return pickLocale(value, locale) ?? value[defaultLocale] ?? Object.values(value)[0] ?? '';
 }
 
 export default function pluginLocalSearch(
@@ -63,7 +64,7 @@ export default function pluginLocalSearch(
     const internal = isInternal(target);
     const keywords = Array.isArray(entry.keywords)
       ? entry.keywords
-      : entry.keywords?.[locale] ?? entry.keywords?.[locale.split('-')[0]] ?? [];
+      : (entry.keywords && pickLocale(entry.keywords, locale)) ?? [];
     return {
       title: localize(entry.title),
       url: localizeUrl(target),
@@ -82,7 +83,7 @@ export default function pluginLocalSearch(
   const openSearch = searchUrl && options.openSearch ? (options.openSearch === true ? {} : options.openSearch) : null;
   const searchAction = searchUrl && options.searchAction ? (options.searchAction === true ? {} : options.searchAction) : null;
   const uiMessage = (id: string) =>
-    translations[locale]?.[id] ?? translations[locale.split('-')[0]]?.[id] ?? DEFAULT_MESSAGES[id];
+    pickLocale(translations, locale)?.[id] ?? DEFAULT_MESSAGES[id];
 
   // Thème compilé en JavaScript pour le build ; sources TypeScript pour `swizzle --typescript`.
   const themePath = path.resolve(__dirname, 'theme');
@@ -100,7 +101,7 @@ export default function pluginLocalSearch(
     },
 
     getDefaultCodeTranslationMessages() {
-      return translations[locale] ?? translations[locale.split('-')[0]] ?? {};
+      return pickLocale(translations, locale) ?? {};
     },
 
     getClientModules() {
@@ -142,7 +143,7 @@ export default function pluginLocalSearch(
         locale,
         synonyms: options.synonyms,
         stopWords:
-          options.stopWords[locale] ?? DEFAULT_STOP_WORDS[locale] ?? DEFAULT_STOP_WORDS[locale.split('-')[0]] ?? [],
+          pickLocale(options.stopWords, locale) ?? pickLocale(DEFAULT_STOP_WORDS, locale) ?? [],
         fuzzy: options.fuzzy,
         prefix: options.prefix,
         stemming: options.stemming,
