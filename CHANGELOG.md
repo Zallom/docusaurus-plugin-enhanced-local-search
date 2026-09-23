@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Custom entries accept `standalone: true`: the entry stays a separate result even when its `url` is an indexed page, instead of giving its keywords to that page. Useful for a quick link on top of the results while the page itself is indexed in its own category.
+- Fixed: a content selector matching several elements is now skipped. A page with feature cards in `<article>` tags was indexed from its first card only; its `<main>` is now used.
+- Fixed: a `<br>` in a page title or a section heading now counts as a space ("a bot:<br>your partner" was indexed as "a bot:your partner").
+
 ## 1.1.3
 
 - Fixed: recent searches were shared by every locale, so switching language listed pages (titles and links) of the previous one. They are now kept per locale; the lists saved by earlier versions are left aside.
