@@ -1,7 +1,8 @@
 import React, {type MouseEvent, type ReactNode} from 'react';
 import SearchResult from '@theme/SearchResult';
 import SearchHighlight from '@theme/SearchHighlight';
-import {HashIcon, PageIcon} from '@theme/SearchIcons';
+import {ExternalIcon, HashIcon, PageIcon} from '@theme/SearchIcons';
+import {isExternalUrl} from '@theme/SearchUtils';
 import type {SearchHit, SearchResponse} from '../types';
 import styles from './styles.module.css';
 
@@ -38,7 +39,7 @@ export default function SearchResults({response, active, idPrefix, onSelect, onH
                     title={<SearchHighlight chunks={hit.titleChunks} />}
                     crumbs={hit.crumbs}
                     snippet={hit.snippet.length ? <SearchHighlight chunks={hit.snippet} /> : undefined}
-                    icon={hit.isPage ? <PageIcon /> : <HashIcon />}
+                    icon={isExternalUrl(hit.url) ? <ExternalIcon /> : hit.isPage ? <PageIcon /> : <HashIcon />}
                     active={position === active}
                     onSelect={(event) => onSelect(hit, event)}
                     onHover={() => onHover(position)}

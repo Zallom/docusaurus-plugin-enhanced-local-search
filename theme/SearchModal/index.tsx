@@ -16,7 +16,7 @@ import useLocalSearch from '@theme/useLocalSearch';
 import SearchResults from '@theme/SearchResults';
 import SearchResult from '@theme/SearchResult';
 import {ArrowDownIcon, ArrowUpIcon, ClockIcon, CloseIcon, EnterIcon, SearchIcon, StarIcon} from '@theme/SearchIcons';
-import {useRecentSearches, type RecentEntry} from '@theme/SearchUtils';
+import {isExternalUrl, openExternal, useRecentSearches, type RecentEntry} from '@theme/SearchUtils';
 import type {SearchHit} from '../types';
 import styles from './styles.module.css';
 
@@ -97,13 +97,19 @@ export default function SearchModal({initialQuery, revision, onClose}: SearchMod
   const go = (item: Item) => {
     if (item.recent) recent.add(item.recent);
     onClose();
-    history.push(item.url);
+    if (isExternalUrl(item.url)) openExternal(item.url);
+    else history.push(item.url);
   };
 
   const onLinkClick = (item: Item, event: MouseEvent<HTMLAnchorElement>) => {
     // Cmd/Ctrl/Shift+clic : on laisse le navigateur ouvrir un nouvel onglet.
     if (isModified(event) || event.button !== 0) {
       if (item.recent) recent.add(item.recent);
+      return;
+    }
+    if (isExternalUrl(item.url)) {
+      if (item.recent) recent.add(item.recent);
+      onClose();
       return;
     }
     event.preventDefault();

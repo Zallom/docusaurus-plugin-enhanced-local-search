@@ -1,6 +1,7 @@
 import React, {type MouseEvent, type ReactNode} from 'react';
 import {translate} from '@docusaurus/Translate';
 import {CloseIcon, EnterIcon} from '@theme/SearchIcons';
+import {isExternalUrl} from '@theme/SearchUtils';
 import styles from './styles.module.css';
 
 export interface SearchResultProps {
@@ -36,6 +37,7 @@ export default function SearchResult({
       <a
         id={id}
         href={url}
+        {...(isExternalUrl(url) ? {target: '_blank', rel: 'noopener noreferrer'} : {})}
         role="option"
         aria-selected={active}
         className={active ? `${styles.hit} ${styles.hitActive}` : styles.hit}

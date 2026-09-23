@@ -66,6 +66,15 @@ export function shortcutLabel(shortcut: string, mac: boolean): string[] {
   return keys;
 }
 
+/** Lien hors du site (`https://…`, `mailto:`…) : ouvert dans un nouvel onglet. */
+export function isExternalUrl(url: string): boolean {
+  return /^[a-z][a-z\d+.-]*:/i.test(url) || url.startsWith('//');
+}
+
+export function openExternal(url: string): void {
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 export interface RecentEntry {
   url: string;
   title: string;

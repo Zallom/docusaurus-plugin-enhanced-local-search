@@ -6,6 +6,7 @@ import SearchModalHost from '@theme/SearchModalHost';
 import SearchResults from '@theme/SearchResults';
 import {ArrowRightIcon, SearchIcon} from '@theme/SearchIcons';
 import {openSearch} from '@theme/SearchStore';
+import {isExternalUrl, openExternal} from '@theme/SearchUtils';
 import styles from './styles.module.css';
 
 export interface SearchHeroProps {
@@ -93,8 +94,9 @@ export default function SearchHero({
       setActive((current) => (current + delta + hits.length) % hits.length);
     } else if (event.key === 'Enter' && hits[active]) {
       event.preventDefault();
-      if (event.metaKey || event.ctrlKey) window.open(hits[active].url, '_blank', 'noopener');
-      else history.push(hits[active].url);
+      const {url} = hits[active];
+      if (event.metaKey || event.ctrlKey || isExternalUrl(url)) openExternal(url);
+      else history.push(url);
     }
   };
 
@@ -177,7 +179,7 @@ export default function SearchHero({
               active={active}
               idPrefix={idPrefix}
               onSelect={(hit, event) => {
-                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0 || isExternalUrl(hit.url)) return;
                 event.preventDefault();
                 history.push(hit.url);
               }}

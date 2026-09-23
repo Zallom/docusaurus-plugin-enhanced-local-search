@@ -76,6 +76,8 @@ declare module '@theme/SearchUtils' {
     alt: boolean;
   }
   export function isMacPlatform(): boolean;
+  export function isExternalUrl(url: string): boolean;
+  export function openExternal(url: string): void;
   export function useIsMac(): boolean | null;
   export function isEditable(target: EventTarget | null): boolean;
   export function parseShortcut(shortcut: string): Shortcut;
@@ -101,6 +103,7 @@ declare module '@theme/SearchIcons' {
   export const ArrowUpIcon: Icon;
   export const ArrowDownIcon: Icon;
   export const ArrowRightIcon: Icon;
+  export const ExternalIcon: Icon;
 }
 
 declare module '@theme/SearchHighlight' {
