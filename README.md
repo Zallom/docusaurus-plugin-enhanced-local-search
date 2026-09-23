@@ -51,41 +51,114 @@ All components live in the theme and can be imported with `@theme/…`.
 
 | Component | Use |
 |---|---|
-| `SearchBar` | Rendered by the navbar item `{type: 'search'}`. Collapses to an icon button below 997 px. |
-| `SearchInput` | Mini bar to place anywhere, for example in a swizzled footer. |
-| `SearchHero` | Large search bar for a page. |
-| `SearchPage` | The page added by the `searchPagePath` option. |
-| `SearchModalHost` | Mounts the modal and the keyboard shortcuts. Every bar includes it; mount it alone to get ⌘K without any visible bar. |
+| [`SearchHero`](#searchhero-large-search-bar) | Large, ChatGPT-style search bar for a page. |
+| [`SearchInput`](#searchinput-mini-search-bar) | Mini bar to place anywhere, for example in a swizzled footer. |
+| [`SearchBar`](#searchbar-navbar-bar) | Rendered by the navbar item `{type: 'search'}`. Collapses to an icon button below 997 px. |
+| [`SearchPage`](#searchpage-search-page) | The page added by the `searchPagePath` option. |
+| [`SearchModalHost`](#searchmodalhost-k-without-any-bar) | Mounts the modal and the keyboard shortcuts. Every bar includes it. |
 
-```jsx
-import SearchInput from '@theme/SearchInput';
+### `SearchHero`: large search bar
+
+A big, ChatGPT-style search bar to put at the top of a page: a landing page, the documentation home, a help center. It has a title, a subtitle, suggestion chips and a round submit button.
+
+In an MDX page:
+
+```mdx
+---
+title: Help center
+---
+
 import SearchHero from '@theme/SearchHero';
-
-<SearchInput placeholder="Search the docs" />
 
 <SearchHero
   title="How can we help?"
   subtitle="Search the guides, features and FAQ."
   suggestions={['Getting started', 'Configuration', 'Troubleshooting']}
 />
-
-{/* Results below the bar instead of the modal */}
-<SearchHero inline />
 ```
 
-The modal can also be opened from code:
+In a React page:
+
+```jsx
+import Layout from '@theme/Layout';
+import SearchHero from '@theme/SearchHero';
+
+export default function Help() {
+  return (
+    <Layout title="Help center">
+      <main className="container margin-vert--xl">
+        <SearchHero
+          title="How can we help?"
+          suggestions={['Getting started', 'Configuration']}
+        />
+      </main>
+    </Layout>
+  );
+}
+```
+
+It works in two modes:
+
+- **Modal** (default): typing, pressing Enter or clicking a chip opens the search modal with the text already filled in.
+- **Inline** (`inline`): results are listed right below the bar, with the same keyboard navigation. Add `syncUrl` to keep the query in the URL (`?q=`), so the page can be shared and reloaded with its results.
+
+```jsx
+<SearchHero inline syncUrl title="Search the docs" />
+```
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `title` | `ReactNode` | none | Heading above the bar, rendered as an `h1`. |
+| `subtitle` | `ReactNode` | none | Text between the heading and the bar. |
+| `placeholder` | `string` | translated "Search the documentation…" | Placeholder of the field. |
+| `suggestions` | `string[]` | `[]` | Queries shown as clickable chips under the bar. |
+| `inline` | `boolean` | `false` | Show results below the bar instead of opening the modal. |
+| `syncUrl` | `boolean` | `false` | With `inline`, keep the query in the `?q=` URL parameter. |
+| `initialQuery` | `string` | `''` | Query filled in on first render. |
+| `className` | `string` | none | Extra class on the root element. |
+
+Its look is driven by `--lsearch-hero-radius`, `--lsearch-hero-bg`, `--lsearch-hero-shadow` and `--lsearch-accent` (see [Colors and sizes](#colors-and-sizes)).
+
+### `SearchInput`: mini search bar
+
+A compact bar with the keyboard shortcut displayed (⌘ K on macOS, Ctrl K elsewhere). A click opens the modal; typing directly in the bar opens the modal with what was typed. The index starts loading as soon as the bar is hovered or focused.
+
+To add it to the footer, swizzle the footer and drop the component in:
+
+```jsx
+import SearchInput from '@theme/SearchInput';
+
+<SearchInput placeholder="Search the docs" showShortcut={false} />
+```
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `placeholder` | `string` | translated "Search" | Placeholder of the field. |
+| `showShortcut` | `boolean` | `true` | Display the keyboard shortcut. |
+| `variant` | `'default' \| 'navbar'` | `'default'` | `navbar` collapses to an icon button below 997 px. |
+| `className` | `string` | none | Extra class on the root element. |
+
+Its width, height and radius come from `--lsearch-bar-width`, `--lsearch-bar-height` and `--lsearch-bar-radius`.
+
+### `SearchBar`: navbar bar
+
+Rendered by the navbar item `{type: 'search'}`. It is a `SearchInput` with the `navbar` variant. Swizzle it to change the navbar bar only, without touching the other bars.
+
+### `SearchPage`: search page
+
+Added by the `searchPagePath` option. It renders a `SearchHero` in inline mode with the query kept in the URL, and is excluded from search engines (`noindex`). The modal links to it with "See all results".
+
+### `SearchModalHost`: ⌘K without any bar
+
+Every bar already includes it. Mount it on its own, for example in a swizzled `Root`, to get ⌘K on a site that shows no search bar.
+
+### Opening the search from code
 
 ```js
-import {openSearch} from '@theme/SearchStore';
+import {openSearch, closeSearch} from '@theme/SearchStore';
 
 openSearch('installation');
 ```
-
-### Props
-
-**`SearchInput`**: `placeholder`, `className`, `showShortcut` (default `true`), `variant` (`'default'` or `'navbar'`).
-
-**`SearchHero`**: `title`, `subtitle`, `placeholder`, `suggestions`, `inline` (show results below instead of opening the modal), `syncUrl` (with `inline`, keep `?q=` in the URL), `initialQuery`, `className`.
 
 ## Options
 
@@ -175,6 +248,7 @@ The search uses your Infima variables by default. Override any of these in your 
 
   --lsearch-hero-radius: 28px;
   --lsearch-hero-bg: var(--ifm-background-surface-color);
+  --lsearch-hero-shadow: 0 12px 48px -16px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--lsearch-border);
 }
 ```
 
