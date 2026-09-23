@@ -33,6 +33,7 @@ export function applyCustomEntries(pages: IndexedPage[], entries: ResolvedEntry[
       s: [],
       k: entry.keywords.join(' ') || undefined,
       p: entry.priority,
+      m: 1,
     });
     added++;
   }

@@ -52,6 +52,8 @@ interface SectionRecord {
   keywords: string;
   /** Priorité ajoutée à la main (`customEntries`), sur l'enregistrement de la page. */
   pin: number;
+  /** Entrée manuelle : sa description s'affiche mais n'est pas cherchée. */
+  manual: boolean;
 }
 
 /** Minuscules sans accents : « Bannissement » et « bannissément » donnent le même terme.
@@ -211,6 +213,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
         context: isPage ? page.b.join(' ') : `${page.t} ${page.b.join(' ')}`,
         keywords: isPage ? page.k ?? '' : '',
         pin: isPage ? page.p ?? 0 : 0,
+        manual: page.m === 1,
       });
     });
     // Une page sans introduction reste trouvable par son titre.
@@ -230,6 +233,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
         context: page.b.join(' '),
         keywords: page.k ?? '',
         pin: page.p ?? 0,
+        manual: page.m === 1,
       });
     }
   });
@@ -237,6 +241,10 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
   const mini = new MiniSearch<SectionRecord>({
     fields: ['title', 'keywords', 'heading', 'content', 'context'],
     storeFields: [],
+    // La description d'une entrée manuelle (« Invitez RaidProtect… ») ne doit
+    // pas la faire remonter sur « raid » : seuls son titre et ses mots-clés comptent.
+    extractField: (record, field) =>
+      record.manual && field === 'content' ? '' : String(record[field as keyof SectionRecord] ?? ''),
     tokenize: split,
     processTerm: (term) => {
       const processed = processTerm(term);

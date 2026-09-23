@@ -105,6 +105,8 @@ export interface IndexedPage {
   k?: string;
   /** Priorité ajoutée par `customEntries`. */
   p?: number;
+  /** Entrée manuelle : seuls le titre et les mots-clés sont cherchés. */
+  m?: 1;
 }
 
 export interface SearchIndexFile {
