@@ -45,7 +45,6 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   recentSearches: 5,
   suggestions: [],
   searchPagePath: false,
-  showBranding: true,
   storageKey: 'local-search',
 };
 
@@ -80,7 +79,6 @@ const schema = Joi.object<PluginOptions>({
     .items(Joi.object({label: localized.required(), href: Joi.string().required()}))
     .default(DEFAULT_OPTIONS.suggestions),
   searchPagePath: Joi.alternatives().try(Joi.string(), Joi.boolean().valid(false)).default(DEFAULT_OPTIONS.searchPagePath),
-  showBranding: Joi.boolean().default(DEFAULT_OPTIONS.showBranding),
   storageKey: Joi.string().default(DEFAULT_OPTIONS.storageKey),
 });
 

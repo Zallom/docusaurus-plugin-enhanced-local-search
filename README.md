@@ -194,7 +194,6 @@ plugins: [
 | `recentSearches` | `5` | Number of recent results kept in the browser. `0` disables them. |
 | `suggestions` | `[]` | `[{label, href}]` shown when the search field is empty. `label` can be a per-locale map. |
 | `searchPagePath` | `false` | Adds a search page at this path (for example `'search'`). |
-| `showBranding` | `true` | Small "Local search" label in the modal footer. |
 | `ignorePatterns` | `[]` | Regexes on page paths to exclude from the index. |
 | `contentSelectors` | `['.theme-doc-markdown', 'article .markdown', 'article', 'main']` | Where the page content is read, first match wins. |
 | `excludeSelectors` | navigation, buttons, doc cards… | Elements removed before indexing. Replaces the default list. |

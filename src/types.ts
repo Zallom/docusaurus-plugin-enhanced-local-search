@@ -44,7 +44,6 @@ export interface PluginOptions {
   recentSearches: number;
   suggestions: SuggestionOption[];
   searchPagePath: string | false;
-  showBranding: boolean;
   storageKey: string;
 }
 
@@ -97,6 +96,5 @@ export interface LocalSearchGlobalData {
   recentSearches: number;
   suggestions: {label: string; href: string}[];
   searchPagePath: string | null;
-  showBranding: boolean;
   storageKey: string;
 }

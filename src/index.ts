@@ -120,7 +120,6 @@ export default function pluginLocalSearch(
         recentSearches: options.recentSearches,
         suggestions: options.suggestions.map((s) => ({label: localize(s.label), href: s.href})),
         searchPagePath,
-        showBranding: options.showBranding,
         storageKey: options.storageKey,
       };
       actions.setGlobalData(globalData);

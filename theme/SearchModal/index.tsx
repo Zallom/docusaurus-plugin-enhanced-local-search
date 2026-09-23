@@ -368,7 +368,7 @@ export default function SearchModal({initialQuery, revision, onClose}: SearchMod
               </Translate>
             </span>
           </span>
-          {data.searchPagePath && trimmed ? (
+          {data.searchPagePath && trimmed && (
             <a
               className={styles.seeAll}
               href={`${searchPageUrl}?q=${encodeURIComponent(trimmed)}`}
@@ -382,14 +382,6 @@ export default function SearchModal({initialQuery, revision, onClose}: SearchMod
                 See all results
               </Translate>
             </a>
-          ) : (
-            data.showBranding && (
-              <span className={styles.branding}>
-                <Translate id="localSearch.footer.branding" description="Small label in the modal footer">
-                  Local search
-                </Translate>
-              </span>
-            )
           )}
         </div>
       </div>

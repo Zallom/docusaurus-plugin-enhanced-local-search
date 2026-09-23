@@ -39,7 +39,6 @@ export interface LocalSearchGlobalData {
   recentSearches: number;
   suggestions: {label: string; href: string}[];
   searchPagePath: string | null;
-  showBranding: boolean;
   storageKey: string;
 }
 

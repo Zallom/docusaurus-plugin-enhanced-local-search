@@ -208,10 +208,6 @@
   color: var(--lsearch-accent);
 }
 
-.branding {
-  opacity: 0.8;
-}
-
 @media (max-width: 640px) {
   .overlay {
     padding: 0;
