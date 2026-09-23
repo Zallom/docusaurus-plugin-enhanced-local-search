@@ -28,9 +28,10 @@ declare module '@theme/SearchEngine' {
     size: number;
   }
   export function normalize(text: string): string;
-  export function tokenize(text: string): string[];
-  export function highlight(text: string, terms: Set<string>): Chunk[];
-  export function snippet(text: string, terms: Set<string>, max?: number): Chunk[];
+  export type WordSplitter = (text: string) => {text: string; index: number}[];
+  export function tokenize(words: WordSplitter, text: string): string[];
+  export function highlight(words: WordSplitter, text: string, terms: Set<string>): Chunk[];
+  export function snippet(words: WordSplitter, text: string, terms: Set<string>, max?: number): Chunk[];
   export function createSearchEngine(index: SearchIndexFile, config: EngineConfig): SearchEngine;
 }
 
