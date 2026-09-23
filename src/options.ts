@@ -13,6 +13,8 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   excludeSelectors: [
     '[data-search-ignore]',
     '.hash-link',
+    // Cartes des pages de catégorie (DocCardList) : elles répètent chaque page listée.
+    '.theme-doc-card-container',
     'script',
     'style',
     'noscript',
