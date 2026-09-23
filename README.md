@@ -124,6 +124,7 @@ It works in two modes:
 | `syncUrl` | `boolean` | `false` | With `inline`, keep the query in the `?q=` URL parameter. |
 | `initialQuery` | `string` | `''` | Query filled in on first render. |
 | `showSuggestions` | `boolean` | same as `inline` | With `inline`, list the plugin's `suggestions` option while the field is empty. |
+| `context` | `string` | current page | Category listed first in the results, by `id` or label. See [Contextual priority](#contextual-priority). |
 | `className` | `string` | none | Extra class on the root element. |
 
 Its look is driven by `--lsearch-hero-radius`, `--lsearch-hero-bg`, `--lsearch-hero-shadow` and `--lsearch-accent` (see [Colors and sizes](#colors-and-sizes)).
@@ -145,6 +146,7 @@ import SearchInput from '@theme/SearchInput';
 | `placeholder` | `string` | translated "Search" | Placeholder of the field. |
 | `showShortcut` | `boolean` | `true` | Display the keyboard shortcut. |
 | `variant` | `'default' \| 'navbar'` | `'default'` | `navbar` collapses to an icon button below 997 px. |
+| `context` | `string` | current page | Category listed first in the results, by `id` or label. See [Contextual priority](#contextual-priority). |
 | `className` | `string` | none | Extra class on the root element. |
 
 Its width, height and radius come from `--lsearch-bar-width`, `--lsearch-bar-height` and `--lsearch-bar-radius`.
@@ -167,6 +169,7 @@ Every bar already includes it. Mount it on its own, for example in a swizzled `R
 import {openSearch, closeSearch} from '@theme/SearchStore';
 
 openSearch('installation');
+openSearch('ban', {context: 'docs'}); // documentation listed first
 ```
 
 ## Options
@@ -189,7 +192,8 @@ plugins: [
 
 | Option | Default | Description |
 |---|---|---|
-| `categories` | Docs, Blog | Result groups. `match` is a regex tested on the page path (without locale prefix). `label` is a string or a per-locale map. `boost` weighs the category to break ties. `priority` (default `0`) is the first ranking criterion: a category with a lower priority always comes after the others, for example `priority: -1` to always list blog posts last. |
+| `categories` | Docs, Blog | Result groups. `match` is a regex tested on the page path (without locale prefix); a category without `match` only groups [custom entries](#custom-entries). `label` is a string or a per-locale map. `id` is a stable name for the `context` prop (defaults to the label). `boost` weighs the category to break ties. `priority` (default `0`) is the first ranking criterion: a category with a lower priority always comes after the others, for example `priority: -1` to always list blog posts last. |
+| `contextualPriority` | `true` | Lists first the category of the page where the search is opened. See [Contextual priority](#contextual-priority). |
 | `defaultCategory` | `'Pages'` | Group of pages matching no category. |
 | `synonyms` | `[]` | Groups of equivalent terms. Multi-word entries are supported. |
 | `stopWords` | built-in per locale | `{locale: [...]}`. Words ignored in queries and in the index, so natural-language questions work. A list replaces the built-in one for its locale. |
@@ -251,9 +255,42 @@ With this configuration, typing "add" (or "ajouter" on the French site) lists "A
 | `priority` | `0` to `9`, default `1` | Ranks the entry above pages that match the query just as well. It never lifts an entry above a result matching more of the query words. |
 | `locales` | `string[]` | Locales where the entry exists. All by default. |
 
+Only the title and the keywords of an entry are searched: its description is shown under the title but does not match queries, so a description mentioning your product name does not surface the entry on every search.
+
 When `url` is a page that is already indexed, no duplicate is created: the page gets the keywords (and the entry's title, if different) and the priority.
 
 Custom entries are added after `ignorePatterns` is applied, so they can point to pages you keep out of the index.
+
+### Contextual priority
+
+A search opened from a blog post usually looks for blog posts; from the documentation, for documentation. With `contextualPriority` (on by default), the category of the current page goes first, and the others follow in their usual order.
+
+```js
+categories: [
+  {id: 'docs', match: '^/docs(/|$)', label: 'Documentation', priority: 2},
+  {id: 'glossary', match: '^/learn(/|$)', label: 'Glossary', priority: 1},
+  {id: 'blog', match: '^/blog(/|$)', label: 'Blog', priority: 0},
+  // No `match`: groups custom entries, and stays on top everywhere.
+  {id: 'quick', label: 'Quick links', priority: 10},
+],
+```
+
+| Search opened from | Order |
+|---|---|
+| a documentation page | Documentation, Glossary, Blog |
+| a glossary page | Glossary, Documentation, Blog |
+| a blog post | Blog, Documentation, Glossary |
+| any other page | Documentation, Glossary, Blog |
+
+The current category is placed just above the categories that have a `match`. A category without `match` and with a higher priority, like the quick links above, keeps its place.
+
+To choose the category yourself, pass `context` (an `id` or a label) to `SearchHero`, `SearchInput` or `openSearch()`:
+
+```jsx
+<SearchHero context="glossary" />
+```
+
+Since priority is the first ranking criterion, a category listed first can fill the whole result list for common words. Raise `maxResults` if you want the other categories to show up more often.
 
 ### Excluding content
 
@@ -324,7 +361,7 @@ Every string can be overridden in your site's `i18n/<locale>/code.json`, and `do
 
 Results are ranked criterion after criterion, like Algolia, rather than by a single additive score:
 
-1. category priority, when set;
+1. category priority, when set (the [current category](#contextual-priority) first);
 2. number of query words found;
 3. words found without typos;
 4. `priority` of [custom entries](#custom-entries);
