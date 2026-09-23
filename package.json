@@ -1,16 +1,16 @@
 {
-  "name": "docusaurus-plugin-local-search",
+  "name": "docusaurus-plugin-enhanced-local-search",
   "version": "0.1.0",
   "description": "Local, Algolia-like search for Docusaurus v3: Cmd+K modal, navbar and footer mini bar, big hero search bar, typo-tolerant ranking. No external service.",
   "author": "Zallom <matthias@fca.gg>",
   "license": "MIT",
-  "homepage": "https://github.com/raidprotect/docusaurus-plugin-local-search#readme",
+  "homepage": "https://github.com/Zallom/docusaurus-plugin-enhanced-local-search#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/raidprotect/docusaurus-plugin-local-search.git"
+    "url": "git+https://github.com/Zallom/docusaurus-plugin-enhanced-local-search.git"
   },
   "bugs": {
-    "url": "https://github.com/raidprotect/docusaurus-plugin-local-search/issues"
+    "url": "https://github.com/Zallom/docusaurus-plugin-enhanced-local-search/issues"
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -30,6 +30,7 @@
     "docusaurus-plugin",
     "search",
     "local-search",
+    "enhanced-search",
     "offline-search",
     "algolia-alternative",
     "cmdk",

@@ -1,4 +1,4 @@
-# docusaurus-plugin-local-search
+# docusaurus-plugin-enhanced-local-search
 
 Local, Algolia-like search for Docusaurus v3. No external service, no API key, no crawler to run: the index is built from your site at build time and searched in the browser.
 
@@ -14,13 +14,13 @@ Local, Algolia-like search for Docusaurus v3. No external service, no API key, n
 ## Installation
 
 ```bash
-npm install docusaurus-plugin-local-search
+npm install docusaurus-plugin-enhanced-local-search
 ```
 
 ```js
 // docusaurus.config.js
 export default {
-  plugins: ['docusaurus-plugin-local-search'],
+  plugins: ['docusaurus-plugin-enhanced-local-search'],
   themeConfig: {
     navbar: {
       items: [
@@ -165,7 +165,7 @@ openSearch('installation');
 ```js
 plugins: [
   [
-    'docusaurus-plugin-local-search',
+    'docusaurus-plugin-enhanced-local-search',
     {
       categories: [
         {match: '^/docs(/|$)', label: {en: 'Documentation', fr: 'Documentation'}},
@@ -254,7 +254,7 @@ The search uses your Infima variables by default. Override any of these in your 
 ### Swizzling
 
 ```bash
-npm run swizzle docusaurus-plugin-local-search SearchResult -- --wrap
+npm run swizzle docusaurus-plugin-enhanced-local-search SearchResult -- --wrap
 ```
 
 Safe to eject or wrap: `SearchBar`, `SearchInput`, `SearchHero`, `SearchPage`, `SearchResult`, `SearchResults`, `SearchIcons`. `SearchModal` and `SearchModalHost` are safe to wrap.

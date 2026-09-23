@@ -6,7 +6,7 @@ import type {LocalSearchGlobalData, SearchIndexFile, SearchResponse} from '../ty
 
 export type SearchStatus = 'idle' | 'loading' | 'ready' | 'unavailable' | 'error';
 
-const PLUGIN_NAME = 'docusaurus-plugin-local-search';
+const PLUGIN_NAME = 'docusaurus-plugin-enhanced-local-search';
 
 // Un seul téléchargement de l'index par URL et par session de navigation.
 const engines = new Map<string, Promise<SearchEngine>>();

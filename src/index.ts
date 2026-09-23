@@ -9,7 +9,7 @@ import type {LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexF
 export {validateOptions} from './options';
 export type {PluginOptions, SearchIndexFile, LocalSearchGlobalData} from './types';
 
-const PLUGIN_NAME = 'docusaurus-plugin-local-search';
+const PLUGIN_NAME = 'docusaurus-plugin-enhanced-local-search';
 
 const safe = {eject: 'safe', wrap: 'safe'} as const;
 
@@ -153,7 +153,7 @@ export default function pluginLocalSearch(
       const sections = pages.reduce((n, p) => n + p.s.length, 0);
       const kb = Math.round(fs.statSync(target).size / 1024);
       console.log(
-        `[local-search] (${locale}) indexed ${pages.length} pages, ${sections} sections (${kb} KB), skipped ${skipped}.`,
+        `[enhanced-local-search] (${locale}) indexed ${pages.length} pages, ${sections} sections (${kb} KB), skipped ${skipped}.`,
       );
     },
   };

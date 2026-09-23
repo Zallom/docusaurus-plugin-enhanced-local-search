@@ -14,7 +14,7 @@ export default function SearchModalHost(): ReactNode {
   useEffect(() => registerHost(id), [id]);
   const active = useIsActiveHost(id);
   const {open, query, revision} = useSearchState();
-  const data = usePluginData('docusaurus-plugin-local-search') as LocalSearchGlobalData;
+  const data = usePluginData('docusaurus-plugin-enhanced-local-search') as LocalSearchGlobalData;
   const shortcuts = useMemo(() => data.shortcuts.map(parseShortcut), [data.shortcuts]);
 
   useEffect(() => {
