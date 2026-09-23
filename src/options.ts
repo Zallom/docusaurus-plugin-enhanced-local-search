@@ -1,0 +1,87 @@
+import {Joi} from '@docusaurus/utils-validation';
+import type {OptionValidationContext} from '@docusaurus/types';
+import type {PluginOptions} from './types';
+
+const localized = Joi.alternatives().try(Joi.string(), Joi.object().pattern(Joi.string(), Joi.string()));
+
+export const DEFAULT_OPTIONS: PluginOptions = {
+  indexFileName: 'search-index.json',
+  ignorePatterns: [],
+  onlyCanonical: true,
+  respectNoindex: true,
+  contentSelectors: ['.theme-doc-markdown', 'article .markdown', 'article', 'main'],
+  excludeSelectors: [
+    '.hash-link',
+    'script',
+    'style',
+    'noscript',
+    'svg',
+    'button',
+    'nav',
+    '.theme-doc-toc-mobile',
+    '.theme-edit-this-page',
+    '.pagination-nav',
+    '.theme-doc-footer',
+  ],
+  headingLevels: [2, 3],
+  maxSectionLength: 1500,
+  categories: [
+    {match: '^/docs(/|$)', label: 'Docs'},
+    {match: '^/blog(/|$)', label: 'Blog'},
+  ],
+  defaultCategory: 'Pages',
+  synonyms: [],
+  stopWords: {},
+  fuzzy: 0.2,
+  prefix: true,
+  boost: {title: 4, heading: 2.5, content: 1},
+  maxResults: 20,
+  maxResultsPerPage: 3,
+  shortcuts: ['mod+k', '/'],
+  recentSearches: 5,
+  suggestions: [],
+  searchPagePath: false,
+  showBranding: true,
+  storageKey: 'local-search',
+};
+
+const schema = Joi.object<PluginOptions>({
+  indexFileName: Joi.string().default(DEFAULT_OPTIONS.indexFileName),
+  ignorePatterns: Joi.array().items(Joi.string()).default(DEFAULT_OPTIONS.ignorePatterns),
+  onlyCanonical: Joi.boolean().default(DEFAULT_OPTIONS.onlyCanonical),
+  respectNoindex: Joi.boolean().default(DEFAULT_OPTIONS.respectNoindex),
+  contentSelectors: Joi.array().items(Joi.string()).min(1).default(DEFAULT_OPTIONS.contentSelectors),
+  excludeSelectors: Joi.array().items(Joi.string()).default(DEFAULT_OPTIONS.excludeSelectors),
+  headingLevels: Joi.array().items(Joi.number().integer().min(2).max(6)).min(1).default(DEFAULT_OPTIONS.headingLevels),
+  maxSectionLength: Joi.number().integer().min(100).default(DEFAULT_OPTIONS.maxSectionLength),
+  categories: Joi.array()
+    .items(Joi.object({match: Joi.string().required(), label: localized.required(), boost: Joi.number().min(0)}))
+    .default(DEFAULT_OPTIONS.categories),
+  defaultCategory: localized.default(DEFAULT_OPTIONS.defaultCategory),
+  synonyms: Joi.array().items(Joi.array().items(Joi.string()).min(2)).default(DEFAULT_OPTIONS.synonyms),
+  stopWords: Joi.object().pattern(Joi.string(), Joi.array().items(Joi.string())).default(DEFAULT_OPTIONS.stopWords),
+  fuzzy: Joi.number().min(0).max(0.5).default(DEFAULT_OPTIONS.fuzzy),
+  prefix: Joi.boolean().default(DEFAULT_OPTIONS.prefix),
+  boost: Joi.object({
+    title: Joi.number().min(0).default(DEFAULT_OPTIONS.boost.title),
+    heading: Joi.number().min(0).default(DEFAULT_OPTIONS.boost.heading),
+    content: Joi.number().min(0).default(DEFAULT_OPTIONS.boost.content),
+  }).default(DEFAULT_OPTIONS.boost),
+  maxResults: Joi.number().integer().min(1).default(DEFAULT_OPTIONS.maxResults),
+  maxResultsPerPage: Joi.number().integer().min(1).default(DEFAULT_OPTIONS.maxResultsPerPage),
+  shortcuts: Joi.array().items(Joi.string()).default(DEFAULT_OPTIONS.shortcuts),
+  recentSearches: Joi.number().integer().min(0).default(DEFAULT_OPTIONS.recentSearches),
+  suggestions: Joi.array()
+    .items(Joi.object({label: localized.required(), href: Joi.string().required()}))
+    .default(DEFAULT_OPTIONS.suggestions),
+  searchPagePath: Joi.alternatives().try(Joi.string(), Joi.boolean().valid(false)).default(DEFAULT_OPTIONS.searchPagePath),
+  showBranding: Joi.boolean().default(DEFAULT_OPTIONS.showBranding),
+  storageKey: Joi.string().default(DEFAULT_OPTIONS.storageKey),
+});
+
+export function validateOptions({
+  validate,
+  options,
+}: OptionValidationContext<Partial<PluginOptions>, PluginOptions>): PluginOptions {
+  return validate(schema, options);
+}
