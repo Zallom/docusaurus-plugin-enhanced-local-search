@@ -1,6 +1,11 @@
 /* Traductions par défaut de l'interface. L'anglais est écrit directement dans
  * les composants ; ces messages sont fournis à Docusaurus pour les autres
  * langues et restent surchargeables dans le code.json de chaque site. */
+/** Messages anglais utilisés côté build (le thème les porte lui-même). */
+export const DEFAULT_MESSAGES: Record<string, string> = {
+  'localSearch.openSearch.description': 'Search {siteName}',
+};
+
 const translations: Record<string, Record<string, string>> = {
   fr: {
     'localSearch.input.placeholder': 'Rechercher',

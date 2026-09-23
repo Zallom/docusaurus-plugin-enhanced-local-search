@@ -45,6 +45,8 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   recentSearches: 5,
   suggestions: [],
   customEntries: [],
+  openSearch: true,
+  searchAction: false,
   searchPagePath: false,
   storageKey: 'local-search',
 };
@@ -95,6 +97,12 @@ const schema = Joi.object<PluginOptions>({
       }),
     )
     .default(DEFAULT_OPTIONS.customEntries),
+  openSearch: Joi.alternatives()
+    .try(Joi.boolean(), Joi.object({shortName: localized, description: localized}))
+    .default(DEFAULT_OPTIONS.openSearch),
+  searchAction: Joi.alternatives()
+    .try(Joi.boolean(), Joi.object({id: Joi.string()}))
+    .default(DEFAULT_OPTIONS.searchAction),
   searchPagePath: Joi.alternatives().try(Joi.string(), Joi.boolean().valid(false)).default(DEFAULT_OPTIONS.searchPagePath),
   storageKey: Joi.string().default(DEFAULT_OPTIONS.storageKey),
 });

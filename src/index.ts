@@ -4,7 +4,8 @@ import type {LoadContext, Plugin, SwizzleConfig} from '@docusaurus/types';
 import {buildIndex, joinUrl, type ResolvedCategory} from './indexer/build';
 import {applyCustomEntries, type ResolvedEntry} from './indexer/custom';
 import {DEFAULT_STOP_WORDS} from './stopwords';
-import translations from './translations';
+import translations, {DEFAULT_MESSAGES} from './translations';
+import {openSearchXml, searchActionJsonLd} from './seo';
 import type {CustomEntryOption, LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
 
 export {validateOptions} from './options';
@@ -75,6 +76,14 @@ export default function pluginLocalSearch(
     };
   };
 
+  const siteUrl = siteConfig.url.replace(/\/$/, '');
+  const searchUrl = searchPagePath ? `${siteUrl}${joinUrl(baseUrl, searchPagePath)}?q={searchTerms}` : null;
+  const openSearchPath = joinUrl(baseUrl, '/opensearch.xml');
+  const openSearch = searchUrl && options.openSearch ? (options.openSearch === true ? {} : options.openSearch) : null;
+  const searchAction = searchUrl && options.searchAction ? (options.searchAction === true ? {} : options.searchAction) : null;
+  const uiMessage = (id: string) =>
+    translations[locale]?.[id] ?? translations[locale.split('-')[0]]?.[id] ?? DEFAULT_MESSAGES[id];
+
   // Thème compilé en JavaScript pour le build ; sources TypeScript pour `swizzle --typescript`.
   const themePath = path.resolve(__dirname, 'theme');
   const typeScriptThemePath = path.resolve(__dirname, '..', 'theme');
@@ -96,6 +105,33 @@ export default function pluginLocalSearch(
 
     getClientModules() {
       return [path.join(themePath, 'localSearch.css')];
+    },
+
+    injectHtmlTags() {
+      const headTags = [];
+      if (openSearch) {
+        headTags.push({
+          tagName: 'link',
+          attributes: {
+            rel: 'search',
+            type: 'application/opensearchdescription+xml',
+            title: openSearch.shortName ? localize(openSearch.shortName) : siteConfig.title,
+            href: openSearchPath,
+          },
+        });
+      }
+      if (searchAction && searchUrl) {
+        headTags.push({
+          tagName: 'script',
+          attributes: {type: 'application/ld+json'},
+          innerHTML: searchActionJsonLd({
+            id: searchAction.id ?? `${siteUrl}${baseUrl}#website`,
+            url: `${siteUrl}${baseUrl}`,
+            template: searchUrl,
+          }),
+        });
+      }
+      return {headTags};
     },
 
     async contentLoaded({actions}) {
@@ -147,6 +183,23 @@ export default function pluginLocalSearch(
         pages,
         options.customEntries.filter((entry) => !entry.locales || entry.locales.includes(locale)).map(resolveEntry),
       );
+
+      if (openSearch && searchUrl) {
+        const favicon = siteConfig.favicon;
+        fs.writeFileSync(
+          path.join(outDir, 'opensearch.xml'),
+          openSearchXml({
+            shortName: openSearch.shortName ? localize(openSearch.shortName) : siteConfig.title,
+            description: openSearch.description
+              ? localize(openSearch.description)
+              : uiMessage('localSearch.openSearch.description').replace('{siteName}', siteConfig.title),
+            template: searchUrl,
+            selfUrl: `${siteUrl}${openSearchPath}`,
+            language: i18n.localeConfigs[locale]?.htmlLang ?? locale,
+            icon: favicon ? (/^https?:/.test(favicon) ? favicon : `${siteUrl}${joinUrl(siteConfig.baseUrl, `/${favicon.replace(/^\//, '')}`)}`) : null,
+          }),
+        );
+      }
 
       const index: SearchIndexFile = {v: 1, locale, pages};
       const target = path.join(outDir, options.indexFileName);

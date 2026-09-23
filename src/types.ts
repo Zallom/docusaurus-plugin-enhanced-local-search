@@ -65,6 +65,10 @@ export interface PluginOptions {
   recentSearches: number;
   suggestions: SuggestionOption[];
   customEntries: CustomEntryOption[];
+  /** Publie une description OpenSearch (`opensearch.xml`) pour la page de recherche. */
+  openSearch: boolean | {shortName?: LocalizedString; description?: LocalizedString};
+  /** Ajoute un nœud schema.org `WebSite` avec une `SearchAction` vers la page de recherche. */
+  searchAction: boolean | {id?: string};
   searchPagePath: string | false;
   storageKey: string;
 }
