@@ -50,7 +50,8 @@ export default function SearchModal({initialQuery, revision, context, onClose}: 
   const dialogRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState(initialQuery);
   const [active, setActive] = useState(0);
-  const recent = useRecentSearches(data.storageKey, data.recentSearches);
+  // Une liste par langue : sinon le site anglais propose les pages françaises ouvertes avant.
+  const recent = useRecentSearches(`${data.storageKey}:${data.locale}`, data.recentSearches);
   const searchPageUrl = useBaseUrl(data.searchPagePath ?? '/');
 
   // Texte envoyé par une barre pendant que la modale est ouverte.

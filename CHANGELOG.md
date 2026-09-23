@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+- Fixed: recent searches were shared by every locale, so switching language listed pages (titles and links) of the previous one. They are now kept per locale; the lists saved by earlier versions are left aside.
+
 ## 1.1.2
 
 - Fixed: `--lsearch-*` variables redefined on `:root` in a site's CSS were ignored, because the plugin's defaults were loaded after it with the same specificity. The defaults now use `:where(:root)`, so the site always wins.

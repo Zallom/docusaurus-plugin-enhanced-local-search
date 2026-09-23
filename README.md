@@ -218,7 +218,7 @@ plugins: [
 | `onlyCanonical` | `true` | Skip pages whose canonical URL points to another page. |
 | `respectNoindex` | `true` | Skip pages with `<meta name="robots" content="noindex">`. |
 | `indexFileName` | `'search-index.json'` | Name of the generated index file. |
-| `storageKey` | `'local-search'` | Prefix of the keys stored in `localStorage`. |
+| `storageKey` | `'local-search'` | Prefix of the keys stored in `localStorage`. Recent searches are kept per locale, under `<storageKey>:<locale>:recent`. |
 
 ### Custom entries
 
