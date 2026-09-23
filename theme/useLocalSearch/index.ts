@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {usePluginData} from '@docusaurus/useGlobalData';
+import {useLocation} from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import {createSearchEngine, type SearchEngine} from '@theme/SearchEngine';
 import type {LocalSearchGlobalData, SearchIndexFile, SearchResponse} from '../types';
@@ -40,7 +41,21 @@ export interface UseLocalSearch {
   data: LocalSearchGlobalData;
   /** Lance le téléchargement de l'index sans attendre l'ouverture (survol, focus). */
   prefetch: () => void;
-  search: (query: string) => SearchResponse | null;
+  search: (query: string, options?: {context?: string | null}) => SearchResponse | null;
+}
+
+/* Catégorie à mettre en tête : celle imposée par la barre (id ou libellé), sinon
+ * celle de la page courante si `contextualPriority` est actif. Renvoie le libellé. */
+export function useSearchContext(explicit?: string | null): string | null {
+  const data = usePluginData(PLUGIN_NAME) as LocalSearchGlobalData;
+  const {pathname} = useLocation();
+  const baseUrl = useBaseUrl('/');
+  if (explicit) {
+    return data.categoryContexts.find((c) => c.id === explicit || c.label === explicit)?.label ?? explicit;
+  }
+  if (!data.contextualPriority) return null;
+  const path = pathname.startsWith(baseUrl) ? `/${pathname.slice(baseUrl.length)}` : pathname;
+  return data.categoryContexts.find((c) => new RegExp(c.match).test(path))?.label ?? null;
 }
 
 export default function useLocalSearch({autoLoad = false}: {autoLoad?: boolean} = {}): UseLocalSearch {
@@ -65,9 +80,9 @@ export default function useLocalSearch({autoLoad = false}: {autoLoad?: boolean} 
   }, [autoLoad, prefetch]);
 
   const search = useCallback(
-    (query: string) => {
+    (query: string, options?: {context?: string | null}) => {
       const engine = ready.get(url);
-      return engine ? engine.search(query) : null;
+      return engine ? engine.search(query, options) : null;
     },
     [url, status],
   );

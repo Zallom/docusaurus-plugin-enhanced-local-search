@@ -46,8 +46,10 @@ export default function pluginLocalSearch(
   const locale = i18n.currentLocale;
   const localize = (value: LocalizedString) => resolveLocalized(value, locale, i18n.defaultLocale);
 
-  const categories: (ResolvedCategory & {boost: number; priority: number})[] = options.categories.map((cat) => ({
-    re: new RegExp(cat.match),
+  const categories: (ResolvedCategory & {id: string; match?: string; boost: number; priority: number})[] = options.categories.map((cat) => ({
+    id: cat.id ?? localize(cat.label),
+    match: cat.match,
+    re: cat.match ? new RegExp(cat.match) : null,
     label: localize(cat.label),
     boost: cat.boost ?? 1,
     priority: cat.priority ?? 0,
@@ -72,7 +74,7 @@ export default function pluginLocalSearch(
       keywords,
       category: entry.category
         ? localize(entry.category)
-        : (internal && categories.find((cat) => cat.re.test(target.split('#')[0]))?.label) || defaultCategory,
+        : (internal && categories.find((cat) => cat.re?.test(target.split('#')[0]))?.label) || defaultCategory,
       priority: entry.priority ?? 1,
     };
   };
@@ -150,6 +152,13 @@ export default function pluginLocalSearch(
         boost: options.boost,
         categoryBoosts: Object.fromEntries(categories.map((cat) => [cat.label, cat.boost])),
         categoryPriorities: Object.fromEntries(categories.map((cat) => [cat.label, cat.priority])),
+        categoryContexts: categories
+          .filter((cat) => cat.match)
+          .map((cat) => ({id: cat.id, label: cat.label, match: cat.match as string})),
+        // Juste au-dessus des catégories liées à des chemins : une catégorie sans
+        // `match` et plus prioritaire (liens rapides) reste devant.
+        contextPriority: Math.max(0, ...categories.filter((cat) => cat.match).map((cat) => cat.priority)) + 1,
+        contextualPriority: options.contextualPriority,
         maxResults: options.maxResults,
         maxResultsPerPage: options.maxResultsPerPage,
         shortcuts: options.shortcuts,

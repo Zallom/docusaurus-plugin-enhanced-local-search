@@ -14,6 +14,8 @@ export interface SearchInputProps {
   showShortcut?: boolean;
   /** `navbar` se replie en bouton-icône sur petit écran. */
   variant?: 'default' | 'navbar';
+  /** Catégorie mise en tête des résultats (`id` ou libellé). Par défaut, celle de la page. */
+  context?: string;
 }
 
 /* Mini barre de recherche, pour la navbar, le footer ou n'importe quelle
@@ -24,6 +26,7 @@ export default function SearchInput({
   className,
   showShortcut = true,
   variant = 'default',
+  context,
 }: SearchInputProps): ReactNode {
   const {data, prefetch} = useLocalSearch();
   const mac = useIsMac();
@@ -34,7 +37,7 @@ export default function SearchInput({
   const shortcut = data.shortcuts.find((s) => s.includes('+')) ?? data.shortcuts[0];
 
   const open = (text: string) => {
-    openSearch(text);
+    openSearch(text, {context});
     setValue('');
   };
 

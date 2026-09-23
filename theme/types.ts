@@ -36,6 +36,9 @@ export interface LocalSearchGlobalData {
   boost: {title: number; heading: number; content: number};
   categoryBoosts: Record<string, number>;
   categoryPriorities: Record<string, number>;
+  categoryContexts: {id: string; label: string; match: string}[];
+  contextPriority: number;
+  contextualPriority: boolean;
   maxResults: number;
   maxResultsPerPage: number;
   shortcuts: string[];

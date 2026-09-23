@@ -2,7 +2,7 @@ import React, {useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, 
 import {useHistory, useLocation} from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Translate, {translate} from '@docusaurus/Translate';
-import useLocalSearch from '@theme/useLocalSearch';
+import useLocalSearch, {useSearchContext} from '@theme/useLocalSearch';
 import SearchModalHost from '@theme/SearchModalHost';
 import SearchResults from '@theme/SearchResults';
 import SearchResult from '@theme/SearchResult';
@@ -24,6 +24,8 @@ export interface SearchHeroProps {
   initialQuery?: string;
   /** En mode `inline`, liste les suggestions du plugin tant que rien n'est tapé. Activé par défaut en `inline`. */
   showSuggestions?: boolean;
+  /** Catégorie mise en tête des résultats (`id` ou libellé). Par défaut, celle de la page. */
+  context?: string;
   className?: string;
 }
 
@@ -39,6 +41,7 @@ export default function SearchHero({
   syncUrl = false,
   initialQuery = '',
   showSuggestions = inline,
+  context,
   className,
 }: SearchHeroProps): ReactNode {
   const {status, data, prefetch, search} = useLocalSearch({autoLoad: inline});
@@ -57,9 +60,10 @@ export default function SearchHero({
     });
 
   const trimmed = query.trim();
+  const searchContext = useSearchContext(context);
   const response = useMemo(
-    () => (inline && trimmed && status === 'ready' ? search(trimmed) : null),
-    [inline, trimmed, status, search],
+    () => (inline && trimmed && status === 'ready' ? search(trimmed, {context: searchContext}) : null),
+    [inline, trimmed, status, search, searchContext],
   );
   const hits = response?.hits ?? [];
   // Formulaire GET classique (`/search?q=`) : il marche sans JavaScript et les
@@ -85,7 +89,7 @@ export default function SearchHero({
       setQuery(text);
       inputRef.current?.focus();
     } else {
-      openSearch(text);
+      openSearch(text, {context});
       setQuery('');
     }
   };

@@ -9,9 +9,11 @@ export interface SearchState {
   query: string;
   /** Incrémenté à chaque ouverture ou envoi de texte, pour resynchroniser la modale. */
   revision: number;
+  /** Catégorie imposée par la barre qui a ouvert la recherche (id ou libellé). */
+  context: string | null;
 }
 
-let state: SearchState = {open: false, query: '', revision: 0};
+let state: SearchState = {open: false, query: '', revision: 0, context: null};
 const listeners = new Set<() => void>();
 
 const emit = () => listeners.forEach((listener) => listener());
@@ -22,8 +24,8 @@ const subscribe = (listener: () => void) => {
   };
 };
 
-export function openSearch(query = ''): void {
-  state = {open: true, query, revision: state.revision + 1};
+export function openSearch(query = '', {context = null}: {context?: string | null} = {}): void {
+  state = {open: true, query, revision: state.revision + 1, context};
   emit();
 }
 

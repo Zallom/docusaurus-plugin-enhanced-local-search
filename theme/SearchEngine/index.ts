@@ -12,6 +12,8 @@ export interface EngineConfig {
   categoryBoosts: Record<string, number>;
   /** Priorité par catégorie, premier critère de classement. */
   categoryPriorities?: Record<string, number>;
+  /** Priorité donnée à la catégorie de contexte (`search(query, {context})`). */
+  contextPriority?: number;
   maxResults: number;
   maxResultsPerPage: number;
   /** Langue du contenu, pour la racinisation. */
@@ -20,8 +22,13 @@ export interface EngineConfig {
   stemming?: boolean;
 }
 
+export interface SearchOptions {
+  /** Catégorie (libellé) mise en tête, par exemple celle de la page courante. */
+  context?: string | null;
+}
+
 export interface SearchEngine {
-  search(query: string): SearchResponse;
+  search(query: string, options?: SearchOptions): SearchResponse;
   /** Nombre de sections indexées. */
   size: number;
 }
@@ -288,7 +295,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
     return normalize(suggestion) !== normalize(rawTerms.join(' ')) ? suggestion : null;
   };
 
-  function search(rawQuery: string): SearchResponse {
+  function search(rawQuery: string, {context = null}: SearchOptions = {}): SearchResponse {
     const query = rawQuery.trim();
     const empty: SearchResponse = {query, groups: [], hits: [], suggestion: null, relaxed: false};
     const rawTerms = split(query).filter((t) => processTerm(t));
@@ -360,7 +367,10 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
 
       const weight = (record.isPage ? 1.2 : 1) * (config.categoryBoosts[record.category] ?? 1);
       const tieBreak = Math.min(0.99, Math.log1p(result.score * weight) / 10);
-      const priority = config.categoryPriorities?.[record.category] ?? 0;
+      const priority =
+        context && record.category === context
+          ? config.contextPriority ?? 1
+          : config.categoryPriorities?.[record.category] ?? 0;
       const pin = Math.min(9, Math.max(0, record.pin));
       result.score =
         priority * 1e8 + words * 1e6 + typoFree * 1e5 + pin * 1e4 + place * 1e2 + exact * 10 + precision * 9 + tieBreak;

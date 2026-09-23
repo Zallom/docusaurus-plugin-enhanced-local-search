@@ -4,7 +4,7 @@ import {extractPage} from './extract';
 import type {IndexedPage, PluginOptions} from '../types';
 
 export interface ResolvedCategory {
-  re: RegExp;
+  re: RegExp | null;
   label: string;
 }
 
@@ -101,7 +101,7 @@ export function buildIndex(input: BuildIndexInput): BuildIndexResult {
       u: url,
       t: page.title,
       d: page.description,
-      c: input.categories.find((cat) => cat.re.test(route))?.label ?? input.defaultCategory,
+      c: input.categories.find((cat) => cat.re?.test(route))?.label ?? input.defaultCategory,
       b: page.breadcrumbs,
       s: page.sections,
     });

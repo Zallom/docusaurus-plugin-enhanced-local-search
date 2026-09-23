@@ -12,7 +12,7 @@ import {createPortal} from 'react-dom';
 import {useHistory} from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Translate, {translate} from '@docusaurus/Translate';
-import useLocalSearch from '@theme/useLocalSearch';
+import useLocalSearch, {useSearchContext} from '@theme/useLocalSearch';
 import SearchResults from '@theme/SearchResults';
 import SearchResult from '@theme/SearchResult';
 import {ArrowDownIcon, ArrowUpIcon, ClockIcon, CloseIcon, EnterIcon, SearchIcon, StarIcon} from '@theme/SearchIcons';
@@ -24,6 +24,8 @@ export interface SearchModalProps {
   initialQuery: string;
   /** Change quand un autre composant envoie du texte : la modale reprend alors `initialQuery`. */
   revision: number;
+  /** Catégorie imposée par la barre qui a ouvert la fenêtre ; sinon, celle de la page. */
+  context?: string | null;
   onClose: () => void;
 }
 
@@ -39,7 +41,7 @@ function toRecent(hit: SearchHit): RecentEntry {
   return {url: hit.url, title: hit.isPage ? hit.pageTitle : hit.heading ?? hit.pageTitle, crumbs: hit.crumbs};
 }
 
-export default function SearchModal({initialQuery, revision, onClose}: SearchModalProps): ReactNode {
+export default function SearchModal({initialQuery, revision, context, onClose}: SearchModalProps): ReactNode {
   const {status, data, prefetch, search} = useLocalSearch({autoLoad: true});
   const history = useHistory();
   const idPrefix = `lsearch-${useId().replace(/:/g, '')}`;
@@ -79,7 +81,11 @@ export default function SearchModal({initialQuery, revision, onClose}: SearchMod
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const trimmed = query.trim();
-  const response = useMemo(() => (trimmed && status === 'ready' ? search(trimmed) : null), [trimmed, status, search]);
+  const searchContext = useSearchContext(context);
+  const response = useMemo(
+    () => (trimmed && status === 'ready' ? search(trimmed, {context: searchContext}) : null),
+    [trimmed, status, search, searchContext],
+  );
 
   const items: Item[] = useMemo(() => {
     if (trimmed) return (response?.hits ?? []).map((hit) => ({url: hit.url, recent: toRecent(hit)}));

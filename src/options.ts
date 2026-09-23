@@ -45,6 +45,7 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   recentSearches: 5,
   suggestions: [],
   customEntries: [],
+  contextualPriority: true,
   openSearch: true,
   searchAction: false,
   searchPagePath: false,
@@ -61,7 +62,15 @@ const schema = Joi.object<PluginOptions>({
   headingLevels: Joi.array().items(Joi.number().integer().min(2).max(6)).min(1).default(DEFAULT_OPTIONS.headingLevels),
   maxSectionLength: Joi.number().integer().min(100).default(DEFAULT_OPTIONS.maxSectionLength),
   categories: Joi.array()
-    .items(Joi.object({match: Joi.string().required(), label: localized.required(), boost: Joi.number().min(0), priority: Joi.number()}))
+    .items(
+      Joi.object({
+        id: Joi.string(),
+        match: Joi.string(),
+        label: localized.required(),
+        boost: Joi.number().min(0),
+        priority: Joi.number(),
+      }),
+    )
     .default(DEFAULT_OPTIONS.categories),
   defaultCategory: localized.default(DEFAULT_OPTIONS.defaultCategory),
   synonyms: Joi.array().items(Joi.array().items(Joi.string()).min(2)).default(DEFAULT_OPTIONS.synonyms),
@@ -97,6 +106,7 @@ const schema = Joi.object<PluginOptions>({
       }),
     )
     .default(DEFAULT_OPTIONS.customEntries),
+  contextualPriority: Joi.boolean().default(DEFAULT_OPTIONS.contextualPriority),
   openSearch: Joi.alternatives()
     .try(Joi.boolean(), Joi.object({shortName: localized, description: localized}))
     .default(DEFAULT_OPTIONS.openSearch),

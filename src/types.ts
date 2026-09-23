@@ -2,8 +2,11 @@
 export type LocalizedString = string | Record<string, string>;
 
 export interface CategoryOption {
-  /** Expression régulière testée sur le chemin de la page, sans préfixe de locale (ex. `^/docs`). */
-  match: string;
+  /** Identifiant stable, pour la prop `context` des barres. Par défaut, le libellé. */
+  id?: string;
+  /** Expression régulière testée sur le chemin de la page, sans préfixe de locale (ex. `^/docs`).
+   *  Sans `match`, la catégorie ne sert qu'aux entrées manuelles (`customEntries`). */
+  match?: string;
   label: LocalizedString;
   /** Poids appliqué au score des résultats de cette catégorie (1 par défaut). */
   boost?: number;
@@ -65,6 +68,8 @@ export interface PluginOptions {
   recentSearches: number;
   suggestions: SuggestionOption[];
   customEntries: CustomEntryOption[];
+  /** Met en tête la catégorie de la page où la recherche est ouverte. */
+  contextualPriority: boolean;
   /** Publie une description OpenSearch (`opensearch.xml`) pour la page de recherche. */
   openSearch: boolean | {shortName?: LocalizedString; description?: LocalizedString};
   /** Ajoute un nœud schema.org `WebSite` avec une `SearchAction` vers la page de recherche. */
@@ -121,6 +126,12 @@ export interface LocalSearchGlobalData {
   boost: BoostOptions;
   categoryBoosts: Record<string, number>;
   categoryPriorities: Record<string, number>;
+  /** Catégories liées à des chemins, pour reconnaître celle de la page courante. */
+  categoryContexts: {id: string; label: string; match: string}[];
+  /** Priorité donnée à la catégorie de contexte. */
+  contextPriority: number;
+  /** Déduit le contexte de la page courante quand la barre n'en impose pas. */
+  contextualPriority: boolean;
   maxResults: number;
   maxResultsPerPage: number;
   shortcuts: string[];

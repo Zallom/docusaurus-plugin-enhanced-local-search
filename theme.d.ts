@@ -17,13 +17,14 @@ declare module '@theme/SearchEngine' {
     boost: {title: number; heading: number; content: number};
     categoryBoosts: Record<string, number>;
     categoryPriorities?: Record<string, number>;
+    contextPriority?: number;
     maxResults: number;
     maxResultsPerPage: number;
     locale?: string;
     stemming?: boolean;
   }
   export interface SearchEngine {
-    search(query: string): SearchResponse;
+    search(query: string, options?: {context?: string | null}): SearchResponse;
     size: number;
   }
   export function normalize(text: string): string;
@@ -38,8 +39,9 @@ declare module '@theme/SearchStore' {
     open: boolean;
     query: string;
     revision: number;
+    context: string | null;
   }
-  export function openSearch(query?: string): void;
+  export function openSearch(query?: string, options?: {context?: string | null}): void;
   export function closeSearch(): void;
   export function toggleSearch(): void;
   export function getSearchState(): SearchState;
@@ -56,9 +58,10 @@ declare module '@theme/useLocalSearch' {
     status: SearchStatus;
     data: LocalSearchGlobalData;
     prefetch: () => void;
-    search: (query: string) => SearchResponse | null;
+    search: (query: string, options?: {context?: string | null}) => SearchResponse | null;
   }
   export default function useLocalSearch(options?: {autoLoad?: boolean}): UseLocalSearch;
+  export function useSearchContext(explicit?: string | null): string | null;
 }
 
 declare module '@theme/SearchUtils' {
@@ -151,6 +154,7 @@ declare module '@theme/SearchModal' {
   export interface SearchModalProps {
     initialQuery: string;
     revision: number;
+    context?: string | null;
     onClose: () => void;
   }
   export default function SearchModal(props: SearchModalProps): ReactNode;
@@ -170,6 +174,7 @@ declare module '@theme/SearchInput' {
     className?: string;
     showShortcut?: boolean;
     variant?: 'default' | 'navbar';
+    context?: string;
   }
   export default function SearchInput(props: SearchInputProps): ReactNode;
 }
@@ -192,6 +197,7 @@ declare module '@theme/SearchHero' {
     syncUrl?: boolean;
     initialQuery?: string;
     showSuggestions?: boolean;
+    context?: string;
     className?: string;
   }
   export default function SearchHero(props: SearchHeroProps): ReactNode;
