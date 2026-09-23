@@ -4,7 +4,8 @@ export default defineConfig({
   entry: ['src/index.ts'],
   format: ['cjs'],
   outDir: 'lib',
-  dts: true,
+  // Déclare aussi les modules @theme/Search* pour les sites qui importent le plugin.
+  dts: {banner: '/// <reference path="../theme.d.ts" />'},
   clean: true,
   external: [
     '@docusaurus/types',
