@@ -150,3 +150,17 @@
 .message strong {
   color: var(--lsearch-text);
 }
+
+.groupTitle {
+  padding: 4px 12px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lsearch-accent);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+}

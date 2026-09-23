@@ -122,6 +122,7 @@ It works in two modes:
 | `inline` | `boolean` | `false` | Show results below the bar instead of opening the modal. |
 | `syncUrl` | `boolean` | `false` | With `inline`, keep the query in the `?q=` URL parameter. |
 | `initialQuery` | `string` | `''` | Query filled in on first render. |
+| `showSuggestions` | `boolean` | same as `inline` | With `inline`, list the plugin's `suggestions` option while the field is empty. |
 | `className` | `string` | none | Extra class on the root element. |
 
 Its look is driven by `--lsearch-hero-radius`, `--lsearch-hero-bg`, `--lsearch-hero-shadow` and `--lsearch-accent` (see [Colors and sizes](#colors-and-sizes)).
@@ -153,7 +154,7 @@ Rendered by the navbar item `{type: 'search'}`. It is a `SearchInput` with the `
 
 ### `SearchPage`: search page
 
-Added by the `searchPagePath` option. It renders a `SearchHero` in inline mode with the query kept in the URL, and is excluded from search engines (`noindex`). The modal links to it with "See all results".
+Added by the `searchPagePath` option. It renders a `SearchHero` in inline mode with the query kept in the URL, and is excluded from search engines (`noindex`). While the field is empty, it lists the `suggestions` option. The modal links to it with "See all results".
 
 ### `SearchModalHost`: ⌘K without any bar
 
@@ -199,7 +200,7 @@ plugins: [
 | `maxResultsPerPage` | `3` | Maximum sections shown per page. |
 | `shortcuts` | `['mod+k', '/']` | Keyboard shortcuts. `mod` is ⌘ on macOS and Ctrl elsewhere. Shortcuts without modifier are ignored while typing in a field. |
 | `recentSearches` | `5` | Number of recent results kept in the browser. `0` disables them. |
-| `suggestions` | `[]` | `[{label, href}]` shown when the search field is empty. `label` can be a per-locale map. |
+| `suggestions` | `[]` | `[{label, href}]` shown when the search field is empty, in the modal and on the search page. `label` and `href` can be per-locale maps; a site path (`/docs/setup`) gets the locale prefix. |
 | `customEntries` | `[]` | Results added by hand, or extra keywords on existing pages. See [Custom entries](#custom-entries). |
 | `searchPagePath` | `false` | Adds a search page at this path (for example `'search'`). |
 | `ignorePatterns` | `[]` | Regexes on page paths to exclude from the index. |

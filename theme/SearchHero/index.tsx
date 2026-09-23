@@ -1,10 +1,11 @@
-import React, {useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode} from 'react';
+import React, {useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode} from 'react';
 import {useHistory, useLocation} from '@docusaurus/router';
 import Translate, {translate} from '@docusaurus/Translate';
 import useLocalSearch from '@theme/useLocalSearch';
 import SearchModalHost from '@theme/SearchModalHost';
 import SearchResults from '@theme/SearchResults';
-import {ArrowRightIcon, SearchIcon} from '@theme/SearchIcons';
+import SearchResult from '@theme/SearchResult';
+import {ArrowRightIcon, SearchIcon, StarIcon} from '@theme/SearchIcons';
 import {openSearch} from '@theme/SearchStore';
 import {isExternalUrl, openExternal} from '@theme/SearchUtils';
 import styles from './styles.module.css';
@@ -20,6 +21,8 @@ export interface SearchHeroProps {
   /** En mode `inline`, garde la requête dans l'URL (`?q=`) pour pouvoir la partager. */
   syncUrl?: boolean;
   initialQuery?: string;
+  /** En mode `inline`, liste les suggestions du plugin tant que rien n'est tapé. Activé par défaut en `inline`. */
+  showSuggestions?: boolean;
   className?: string;
 }
 
@@ -34,9 +37,10 @@ export default function SearchHero({
   inline = false,
   syncUrl = false,
   initialQuery = '',
+  showSuggestions = inline,
   className,
 }: SearchHeroProps): ReactNode {
-  const {status, prefetch, search} = useLocalSearch({autoLoad: inline});
+  const {status, data, prefetch, search} = useLocalSearch({autoLoad: inline});
   const history = useHistory();
   const location = useLocation();
   const idPrefix = `lsearch-hero-${useId().replace(/:/g, '')}`;
@@ -57,6 +61,8 @@ export default function SearchHero({
     [inline, trimmed, status, search],
   );
   const hits = response?.hits ?? [];
+  const idle = inline && showSuggestions && !trimmed ? data.suggestions : [];
+  const targets = hits.length ? hits.map((hit) => hit.url) : idle.map((s) => s.href);
 
   useEffect(() => setActive(0), [trimmed]);
 
@@ -88,20 +94,50 @@ export default function SearchHero({
       }
       return;
     }
-    if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && hits.length) {
+    if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && targets.length) {
       event.preventDefault();
       const delta = event.key === 'ArrowDown' ? 1 : -1;
-      setActive((current) => (current + delta + hits.length) % hits.length);
-    } else if (event.key === 'Enter' && hits[active]) {
+      setActive((current) => (current + delta + targets.length) % targets.length);
+    } else if (event.key === 'Enter' && targets[active]) {
       event.preventDefault();
-      const {url} = hits[active];
+      const url = targets[active];
       if (event.metaKey || event.ctrlKey || isExternalUrl(url)) openExternal(url);
       else history.push(url);
     }
   };
 
+  const follow = (url: string, event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0 || isExternalUrl(url)) return;
+    event.preventDefault();
+    history.push(url);
+  };
+
   let results: ReactNode = null;
-  if (inline && trimmed) {
+  if (idle.length) {
+    results = (
+      <section>
+        <div className={styles.groupTitle}>
+          <Translate id="localSearch.suggestions.title" description="Title of the suggested pages list">
+            Suggestions
+          </Translate>
+        </div>
+        <ul id={`${idPrefix}-listbox`} role="listbox" className={styles.list}>
+          {idle.map((suggestion, i) => (
+            <SearchResult
+              key={suggestion.href}
+              id={`${idPrefix}-${i}`}
+              url={suggestion.href}
+              title={suggestion.label}
+              icon={<StarIcon />}
+              active={active === i}
+              onSelect={(event) => follow(suggestion.href, event)}
+              onHover={() => setActive(i)}
+            />
+          ))}
+        </ul>
+      </section>
+    );
+  } else if (inline && trimmed) {
     if (status === 'unavailable') {
       results = (
         <p className={styles.message}>
@@ -178,11 +214,7 @@ export default function SearchHero({
               response={response}
               active={active}
               idPrefix={idPrefix}
-              onSelect={(hit, event) => {
-                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0 || isExternalUrl(hit.url)) return;
-                event.preventDefault();
-                history.push(hit.url);
-              }}
+              onSelect={(hit, event) => follow(hit.url, event)}
               onHover={setActive}
             />
           </div>
@@ -211,9 +243,9 @@ export default function SearchHero({
           placeholder={label}
           aria-label={label}
           role={inline ? 'combobox' : undefined}
-          aria-expanded={inline ? hits.length > 0 : undefined}
+          aria-expanded={inline ? targets.length > 0 : undefined}
           aria-controls={inline ? `${idPrefix}-listbox` : undefined}
-          aria-activedescendant={inline && hits.length ? `${idPrefix}-${active}` : undefined}
+          aria-activedescendant={inline && targets.length ? `${idPrefix}-${active}` : undefined}
           aria-haspopup={inline ? undefined : 'dialog'}
           autoComplete="off"
           spellCheck={false}

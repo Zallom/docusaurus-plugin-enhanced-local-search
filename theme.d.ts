@@ -191,6 +191,7 @@ declare module '@theme/SearchHero' {
     inline?: boolean;
     syncUrl?: boolean;
     initialQuery?: string;
+    showSuggestions?: boolean;
     className?: string;
   }
   export default function SearchHero(props: SearchHeroProps): ReactNode;
