@@ -305,6 +305,8 @@ The search uses your Infima variables by default. Override any of these in your 
 npm run swizzle docusaurus-plugin-enhanced-local-search SearchResult -- --wrap
 ```
 
+Add `--typescript` to get the TypeScript source, `--javascript` for plain JSX.
+
 Safe to eject or wrap: `SearchBar`, `SearchInput`, `SearchHero`, `SearchPage`, `SearchResult`, `SearchResults`, `SearchIcons`. `SearchModal` and `SearchModalHost` are safe to wrap.
 
 Components import each other through `@theme/`, so a swizzled component is picked up everywhere: a custom `SearchResult` is used by the modal, the hero and the search page.
@@ -340,6 +342,8 @@ plugins: [
 ],
 ```
 
+If your config does not import the plugin, add the types another way, for example with `import type {} from 'docusaurus-plugin-enhanced-local-search';` in any `.d.ts` or `.ts` file of your site. Without them, TypeScript does not know the `@theme/Search*` modules used by swizzled components.
+
 ## Limitations
 
 - The index only exists on a built site, not with `docusaurus start`.
@@ -354,7 +358,9 @@ npm run build      # compiles the plugin to lib/
 npm run typecheck  # checks the plugin and the theme
 ```
 
-The theme components (`theme/`) are shipped as TypeScript source and compiled by the Docusaurus site, so they stay swizzlable. To try a change, install the local folder in a Docusaurus site (`npm install ../docusaurus-plugin-enhanced-local-search`), then build and serve the site.
+The theme components are written in TypeScript (`theme/`). The build turns them into JSX files in `lib/theme`, which Docusaurus compiles like its own themes; the TypeScript source is also published for `swizzle --typescript`.
+
+To try a change in a real site, pack the plugin (`npm pack`), install the archive in a Docusaurus site (`npm install ../docusaurus-plugin-enhanced-local-search-0.1.0.tgz`), then build and serve the site.
 
 Issues and pull requests are welcome on [GitHub](https://github.com/Zallom/docusaurus-plugin-enhanced-local-search).
 
