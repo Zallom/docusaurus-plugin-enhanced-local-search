@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type {LoadContext, Plugin} from '@docusaurus/types';
+import type {LoadContext, Plugin, SwizzleConfig} from '@docusaurus/types';
 import {buildIndex, type ResolvedCategory} from './indexer/build';
 import {DEFAULT_STOP_WORDS} from './stopwords';
 import type {LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
@@ -9,6 +9,21 @@ export {validateOptions} from './options';
 export type {PluginOptions, SearchIndexFile, LocalSearchGlobalData} from './types';
 
 const PLUGIN_NAME = 'docusaurus-plugin-local-search';
+
+const safe = {eject: 'safe', wrap: 'safe'} as const;
+
+/** Composants qu'un site peut personnaliser avec `docusaurus swizzle`. */
+export function getSwizzleConfig(): SwizzleConfig {
+  return {
+    components: {
+      SearchResult: {actions: safe, description: 'Une ligne de résultat (titre, fil d\'Ariane, extrait).'},
+      SearchResults: {actions: safe, description: 'Liste des résultats groupés par catégorie.'},
+      SearchModal: {actions: {eject: 'unsafe', wrap: 'safe'}, description: 'La fenêtre de recherche (Cmd+K).'},
+      SearchModalHost: {actions: {eject: 'unsafe', wrap: 'safe'}, description: 'Monte la fenêtre et écoute les raccourcis.'},
+      SearchIcons: {actions: safe, description: 'Icônes utilisées par la recherche.'},
+    },
+  };
+}
 
 function resolveLocalized(value: LocalizedString, locale: string, defaultLocale: string): string {
   if (typeof value === 'string') return value;
@@ -31,8 +46,50 @@ export default function pluginLocalSearch(
   const searchPagePath =
     options.searchPagePath === false ? null : `/${options.searchPagePath.replace(/^\/+|\/+$/g, '')}`;
 
+  const themePath = path.resolve(__dirname, '..', 'theme');
+
   return {
     name: PLUGIN_NAME,
+
+    getThemePath() {
+      return themePath;
+    },
+
+    getTypeScriptThemePath() {
+      return themePath;
+    },
+
+    getClientModules() {
+      return [path.join(themePath, 'localSearch.css')];
+    },
+
+    configureWebpack() {
+      // Le thème est livré en TypeScript source (pour rester swizzlable) :
+      // Docusaurus ne transpile pas les .ts/.tsx de node_modules par défaut.
+      return {
+        module: {
+          rules: [
+            {
+              test: /\.tsx?$/,
+              include: [themePath],
+              use: [
+                {
+                  loader: require.resolve('babel-loader'),
+                  options: {
+                    babelrc: false,
+                    configFile: false,
+                    presets: [
+                      require.resolve('@babel/preset-typescript'),
+                      [require.resolve('@babel/preset-react'), {runtime: 'automatic'}],
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      };
+    },
 
     async contentLoaded({actions}) {
       const globalData: LocalSearchGlobalData = {

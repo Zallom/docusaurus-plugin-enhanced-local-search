@@ -1,0 +1,41 @@
+/* Variables de personnalisation. Elles s'appuient sur Infima : sans rien
+ * toucher, la recherche prend les couleurs et le thème (clair ou sombre) du
+ * site. Pour ajuster, redéfinir une variable dans son propre CSS. */
+:root {
+  --lsearch-accent: var(--ifm-color-primary);
+  --lsearch-text: var(--ifm-font-color-base);
+  --lsearch-muted: var(--ifm-color-emphasis-600);
+  --lsearch-border: var(--ifm-color-emphasis-200);
+  --lsearch-radius: 14px;
+  --lsearch-hit-radius: 10px;
+  --lsearch-z-index: 1000;
+
+  --lsearch-modal-width: 640px;
+  --lsearch-modal-bg: var(--ifm-background-surface-color, #fff);
+  --lsearch-overlay-bg: rgba(15, 16, 25, 0.45);
+  --lsearch-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--lsearch-border);
+  --lsearch-input-height: 58px;
+
+  --lsearch-hit-bg: var(--ifm-color-emphasis-100);
+  --lsearch-hit-active-bg: var(--lsearch-accent);
+  --lsearch-hit-active-text: #fff;
+  --lsearch-mark-bg: rgba(127, 127, 127, 0.2);
+  --lsearch-mark-bg: color-mix(in srgb, var(--lsearch-accent) 24%, transparent);
+  --lsearch-mark-text: inherit;
+  --lsearch-kbd-bg: var(--ifm-background-color, #fff);
+
+  --lsearch-bar-bg: var(--ifm-color-emphasis-100);
+  --lsearch-bar-radius: 999px;
+  --lsearch-bar-height: 36px;
+  --lsearch-bar-width: 12rem;
+
+  --lsearch-hero-radius: 28px;
+  --lsearch-hero-bg: var(--ifm-background-surface-color, #fff);
+  --lsearch-hero-shadow: 0 12px 48px -16px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--lsearch-border);
+}
+
+[data-theme='dark'] {
+  --lsearch-overlay-bg: rgba(0, 0, 0, 0.6);
+  --lsearch-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--lsearch-border);
+  --lsearch-hero-shadow: 0 12px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--lsearch-border);
+}

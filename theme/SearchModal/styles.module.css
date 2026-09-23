@@ -1,0 +1,258 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--lsearch-z-index);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10vh 16px 16px;
+  background: var(--lsearch-overlay-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: lsearch-fade 0.14s ease-out;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--lsearch-modal-width);
+  max-height: min(680px, 80vh);
+  overflow: hidden;
+  border-radius: var(--lsearch-radius);
+  background: var(--lsearch-modal-bg);
+  color: var(--lsearch-text);
+  box-shadow: var(--lsearch-shadow);
+  animation: lsearch-pop 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  height: var(--lsearch-input-height);
+  padding: 0 12px 0 18px;
+  border-bottom: 1px solid var(--lsearch-border);
+}
+
+.headerIcon {
+  flex: none;
+  color: var(--lsearch-accent);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.05rem;
+}
+
+.input::placeholder {
+  color: var(--lsearch-muted);
+}
+
+.input::-webkit-search-cancel-button,
+.input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--lsearch-muted);
+  cursor: pointer;
+}
+
+.clear:hover {
+  color: var(--lsearch-text);
+  background: var(--lsearch-hit-bg);
+}
+
+.close {
+  flex: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--lsearch-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.closeLabel {
+  display: none;
+  font-size: 0.9rem;
+  color: var(--lsearch-accent);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 10px 12px;
+}
+
+.groupTitle {
+  padding: 12px 12px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lsearch-accent);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  margin: 0;
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--lsearch-muted);
+  font-size: 0.92rem;
+}
+
+.noResults {
+  margin: 0 0 12px;
+}
+
+.noResults strong {
+  color: var(--lsearch-text);
+}
+
+.didYouMean {
+  border: 1px solid var(--lsearch-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: transparent;
+  color: var(--lsearch-muted);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.didYouMean strong {
+  color: var(--lsearch-accent);
+}
+
+.didYouMean:hover {
+  border-color: var(--lsearch-accent);
+}
+
+.notice {
+  margin: 8px 12px 0;
+  font-size: 0.8rem;
+  color: var(--lsearch-muted);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex: none;
+  padding: 10px 16px;
+  border-top: 1px solid var(--lsearch-border);
+  font-size: 0.75rem;
+  color: var(--lsearch-muted);
+}
+
+.hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--lsearch-border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--lsearch-kbd-bg);
+  color: var(--lsearch-muted);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.seeAll {
+  font-weight: 600;
+  color: var(--lsearch-accent);
+}
+
+.branding {
+  opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .dialog {
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .close .kbd {
+    display: none;
+  }
+
+  .closeLabel {
+    display: inline;
+  }
+
+  .hints {
+    display: none;
+  }
+}
+
+@keyframes lsearch-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lsearch-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+}

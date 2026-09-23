@@ -200,7 +200,10 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
     if (!alternatives) return term;
     return {
       combineWith: 'OR',
-      queries: [term, ...alternatives.map((form) => (form.length === 1 ? form[0] : {combineWith: 'AND', queries: form}))],
+      queries: [
+        term,
+        ...alternatives.map((form): Query => (form.length === 1 ? form[0] : {combineWith: 'AND', queries: form})),
+      ],
     };
   };
 
