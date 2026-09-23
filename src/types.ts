@@ -36,6 +36,7 @@ export interface PluginOptions {
   stopWords: Record<string, string[]>;
   fuzzy: number;
   prefix: boolean;
+  stemming: boolean;
   boost: BoostOptions;
   maxResults: number;
   maxResultsPerPage: number;
@@ -87,6 +88,7 @@ export interface LocalSearchGlobalData {
   stopWords: string[];
   fuzzy: number;
   prefix: boolean;
+  stemming: boolean;
   boost: BoostOptions;
   categoryBoosts: Record<string, number>;
   maxResults: number;

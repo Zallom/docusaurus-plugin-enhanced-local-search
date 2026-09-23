@@ -37,6 +37,7 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   stopWords: {},
   fuzzy: 0.2,
   prefix: true,
+  stemming: true,
   boost: {title: 4, heading: 2.5, content: 1},
   maxResults: 20,
   maxResultsPerPage: 3,
@@ -65,6 +66,7 @@ const schema = Joi.object<PluginOptions>({
   stopWords: Joi.object().pattern(Joi.string(), Joi.array().items(Joi.string())).default(DEFAULT_OPTIONS.stopWords),
   fuzzy: Joi.number().min(0).max(0.5).default(DEFAULT_OPTIONS.fuzzy),
   prefix: Joi.boolean().default(DEFAULT_OPTIONS.prefix),
+  stemming: Joi.boolean().default(DEFAULT_OPTIONS.stemming),
   boost: Joi.object({
     title: Joi.number().min(0).default(DEFAULT_OPTIONS.boost.title),
     heading: Joi.number().min(0).default(DEFAULT_OPTIONS.boost.heading),

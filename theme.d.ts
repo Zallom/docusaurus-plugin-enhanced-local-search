@@ -18,6 +18,8 @@ declare module '@theme/SearchEngine' {
     categoryBoosts: Record<string, number>;
     maxResults: number;
     maxResultsPerPage: number;
+    locale?: string;
+    stemming?: boolean;
   }
   export interface SearchEngine {
     search(query: string): SearchResponse;

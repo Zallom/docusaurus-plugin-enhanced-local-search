@@ -111,6 +111,7 @@ export default function pluginLocalSearch(
           options.stopWords[locale] ?? DEFAULT_STOP_WORDS[locale] ?? DEFAULT_STOP_WORDS[locale.split('-')[0]] ?? [],
         fuzzy: options.fuzzy,
         prefix: options.prefix,
+        stemming: options.stemming,
         boost: options.boost,
         categoryBoosts: Object.fromEntries(categories.map((cat) => [cat.label, cat.boost])),
         maxResults: options.maxResults,

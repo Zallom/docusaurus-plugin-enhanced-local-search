@@ -30,6 +30,7 @@ export interface LocalSearchGlobalData {
   stopWords: string[];
   fuzzy: number;
   prefix: boolean;
+  stemming: boolean;
   boost: {title: number; heading: number; content: number};
   categoryBoosts: Record<string, number>;
   maxResults: number;

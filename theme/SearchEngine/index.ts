@@ -1,5 +1,6 @@
 import MiniSearch, {type Query, type SearchResult} from 'minisearch';
 import type {Chunk, HitGroup, SearchHit, SearchIndexFile, SearchResponse} from '../types';
+import {createStemmer} from './stemmer';
 
 export interface EngineConfig {
   stopWords: string[];
@@ -10,6 +11,10 @@ export interface EngineConfig {
   categoryBoosts: Record<string, number>;
   maxResults: number;
   maxResultsPerPage: number;
+  /** Langue du contenu, pour la racinisation. */
+  locale?: string;
+  /** Racinisation légère (activer / activé / active). Activée par défaut. */
+  stemming?: boolean;
 }
 
 export interface SearchEngine {
@@ -54,8 +59,10 @@ export function tokenize(text: string): string[] {
   return out;
 }
 
-/** Surligne dans `text` les mots dont la forme normalisée fait partie de `terms`. */
-export function highlight(text: string, terms: Set<string>): Chunk[] {
+type TermKey = (word: string) => string;
+
+/** Surligne dans `text` les mots dont la clé (forme normalisée, racine) fait partie de `terms`. */
+export function highlight(text: string, terms: Set<string>, key: TermKey = normalize): Chunk[] {
   const chunks: Chunk[] = [];
   let last = 0;
   const push = (slice: string, hl: boolean) => {
@@ -67,7 +74,7 @@ export function highlight(text: string, terms: Set<string>): Chunk[] {
   for (const match of text.matchAll(TOKEN_RE)) {
     const token = match[0];
     const start = match.index ?? 0;
-    const joined = normalize(token.replace(/[-'’]/g, ''));
+    const joined = key(token.replace(/[-'’]/g, ''));
     if (token.includes('-') && terms.has(joined)) {
       push(text.slice(last, start), false);
       push(token, true);
@@ -77,7 +84,7 @@ export function highlight(text: string, terms: Set<string>): Chunk[] {
     // Mot simple, ou parties d'un mot composé surlignées séparément.
     let offset = start;
     for (const part of token.split(/([-'’])/)) {
-      if (part && !/^[-'’]$/.test(part) && terms.has(normalize(part))) {
+      if (part && !/^[-'’]$/.test(part) && terms.has(key(part))) {
         push(text.slice(last, offset), false);
         push(part, true);
         last = offset + part.length;
@@ -90,11 +97,11 @@ export function highlight(text: string, terms: Set<string>): Chunk[] {
 }
 
 /** Extrait d'environ `max` caractères autour de la première correspondance. */
-export function snippet(text: string, terms: Set<string>, max = 160): Chunk[] {
+export function snippet(text: string, terms: Set<string>, max = 160, key: TermKey = normalize): Chunk[] {
   if (!text) return [];
   let pos = -1;
   for (const match of text.matchAll(TOKEN_RE)) {
-    if (match[0].split(/[-'’]/).some((part) => terms.has(normalize(part)))) {
+    if (match[0].split(/[-'’]/).some((part) => terms.has(key(part)))) {
       pos = match.index ?? 0;
       break;
     }
@@ -108,19 +115,53 @@ export function snippet(text: string, terms: Set<string>, max = 160): Chunk[] {
     const space = text.lastIndexOf(' ', end);
     if (space > start + max * 0.6) end = space;
   }
-  const chunks = highlight(text.slice(start, end).trim(), terms);
+  const chunks = highlight(text.slice(start, end).trim(), terms, key);
   if (start > 0) chunks.unshift({text: '… ', hl: false});
   if (end < text.length) chunks.push({text: ' …', hl: false});
   return chunks;
 }
 
+/** Distance d'édition bornée (Levenshtein), pour rattacher un terme trouvé par faute à sa requête. */
+function editDistance(a: string, b: string, max: number): number {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({length: b.length + 1}, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      row[j] = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      rowMin = Math.min(rowMin, row[j]);
+    }
+    if (rowMin > max) return max + 1;
+    prev = row;
+  }
+  return prev[b.length];
+}
+
+/** 3 : mot exact (ou synonyme), 2 : préfixe, 1 : trouvé par faute, 0 : sans rapport. */
+function matchLevel(indexTerm: string, group: string[]): number {
+  if (group.includes(indexTerm)) return 3;
+  if (group.some((form) => indexTerm.startsWith(form))) return 2;
+  if (group.some((form) => form.length >= 4 && editDistance(indexTerm, form, form.length >= 6 ? 2 : 1) <= (form.length >= 6 ? 2 : 1))) return 1;
+  return 0;
+}
+
 export function createSearchEngine(index: SearchIndexFile, config: EngineConfig): SearchEngine {
   const stopWords = new Set(config.stopWords.map(normalize));
+  const stem = createStemmer(config.locale ?? 'en', config.stemming !== false);
+  /** Clé d'un mot : sans accents, en minuscules, ramené à sa racine. */
+  const key = (word: string) => stem(normalize(word));
+  const processTerm = (term: string): string | null => {
+    const normalized = normalize(term);
+    return normalized && !stopWords.has(normalized) ? stem(normalized) : null;
+  };
+  // Racine → mot tel qu'il apparaît, pour afficher une suggestion lisible.
+  const surface = new Map<string, string>();
 
-  // Chaque groupe de synonymes : terme normalisé → liste des autres formes, déjà découpées.
+  // Chaque groupe de synonymes : racine → liste des autres formes, déjà découpées.
   const synonyms = new Map<string, string[][]>();
   for (const group of config.synonyms) {
-    const forms = group.map((entry) => tokenize(entry).map(normalize).filter((t) => !stopWords.has(t)));
+    const forms = group.map((entry) => tokenize(entry).map(processTerm).filter((t): t is string => Boolean(t)));
     forms.forEach((form, i) => {
       if (form.length !== 1) return;
       const others = forms.filter((_, j) => j !== i && forms[j].length > 0);
@@ -174,9 +215,11 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
     storeFields: [],
     tokenize,
     processTerm: (term) => {
-      const normalized = normalize(term);
-      return normalized && !stopWords.has(normalized) ? normalized : null;
+      const processed = processTerm(term);
+      if (processed && !surface.has(processed)) surface.set(processed, term.toLowerCase());
+      return processed;
     },
+    searchOptions: {processTerm},
   });
   mini.addAll(records);
 
@@ -216,19 +259,22 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
     );
 
   /** Orthographe la plus proche, mot par mot. */
-  const suggest = (terms: string[]): string | null => {
+  const suggest = (terms: string[], rawTerms: string[]): string | null => {
     const words = terms.map((term) => {
       const best = mini.autoSuggest(term, {fuzzy: 0.4, prefix: false})[0];
-      return best ? best.suggestion.split(' ')[0] : term;
+      const found = best?.suggestion.split(' ')[0];
+      return found ? surface.get(found) ?? found : null;
     });
+    if (words.some((word) => !word)) return null;
     const suggestion = words.join(' ');
-    return suggestion !== terms.join(' ') ? suggestion : null;
+    return normalize(suggestion) !== normalize(rawTerms.join(' ')) ? suggestion : null;
   };
 
   function search(rawQuery: string): SearchResponse {
     const query = rawQuery.trim();
     const empty: SearchResponse = {query, groups: [], hits: [], suggestion: null, relaxed: false};
-    const terms = [...new Set(tokenize(query).map(normalize).filter((t) => t && !stopWords.has(t)))];
+    const rawTerms = tokenize(query).filter((t) => processTerm(t));
+    const terms = [...new Set(rawTerms.map(processTerm).filter((t): t is string => Boolean(t)))];
     if (!terms.length) return empty;
 
     let results: SearchResult[] = run(terms, 'AND');
@@ -238,25 +284,59 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
     // en gardant ceux qui en contiennent le plus.
     if (results.length < 3 && terms.length > 1) {
       const seen = new Set(results.map((r) => r.id));
-      const extra = run(terms, 'OR')
-        .filter((r) => !seen.has(r.id))
-        .map((r) => ({...r, score: r.score * 0.5}));
+      const extra = run(terms, 'OR').filter((r) => !seen.has(r.id));
       if (extra.length) {
         relaxed = results.length === 0;
         results = [...results, ...extra];
       }
     }
 
+    /* Classement par critères successifs, comme Algolia, plutôt que par
+     * somme de scores : avec BM25 seul, un mot rare trouvé par préfixe
+     * (« raidmode ») écrase un mot courant trouvé tel quel (« raid »).
+     * Ordre : mots trouvés, puis sans faute, puis emplacement (titre avant
+     * intertitre avant texte), puis exactitude ; BM25 ne sert qu'à départager. */
     const normalizedQuery = normalize(query);
+    const termGroups = terms.map((term) => [
+      term,
+      ...(synonyms.get(term) ?? []).flat(),
+    ]);
     for (const result of results) {
       const record = records[result.id as number];
+      const matched = Object.entries(result.match);
+      const levels = termGroups.map((group) => {
+        let best = 0;
+        for (const [term] of matched) best = Math.max(best, matchLevel(term, group));
+        return best;
+      });
+      const words = levels.filter((level) => level > 0).length;
+      const typoFree = levels.filter((level) => level >= 2).length;
+      const exact = levels.filter((level) => level === 3).length;
+      const covers = (field: string) =>
+        termGroups.every(
+          (group, i) =>
+            levels[i] === 0 ||
+            matched.some(([term, fields]) => fields.includes(field) && matchLevel(term, group) > 0),
+        );
       const title = normalize(record.isPage ? record.pageTitle : record.heading);
-      if (title === normalizedQuery) result.score *= 3;
-      else if (title.startsWith(normalizedQuery)) result.score *= 1.5;
+      let place = 0;
+      if (title === normalizedQuery) place = 4;
+      else if (covers(record.isPage ? 'title' : 'heading')) place = record.isPage ? 3 : 2;
+      else if (covers('title') || covers('heading')) place = 1;
+
+      // Précision : « Bannir un utilisateur » est un meilleur titre pour
+      // « bannir membre » que « Bannir temporairement un utilisateur ».
+      const titleTerms = new Set(tokenize(record.isPage ? record.pageTitle : record.heading).map(processTerm).filter(Boolean));
+      const covered = [...titleTerms].filter((term) => matched.some(([m]) => m === term)).length;
+      const precision = titleTerms.size ? covered / titleTerms.size : 0;
+
+      const weight = (record.isPage ? 1.2 : 1) * (config.categoryBoosts[record.category] ?? 1);
+      const tieBreak = Math.min(0.99, Math.log1p(result.score * weight) / 10);
+      result.score = words * 1e4 + typoFree * 1e3 + place * 1e2 + exact * 10 + precision * 9 + tieBreak;
     }
     results.sort((a, b) => b.score - a.score);
 
-    if (!results.length) return {...empty, suggestion: suggest(terms)};
+    if (!results.length) return {...empty, suggestion: suggest(terms, rawTerms)};
 
     // Regroupement par page (sections les mieux classées), puis par catégorie
     // dans l'ordre de pertinence de leur meilleure page.
@@ -280,8 +360,8 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
         crumbs: record.isPage ? record.crumbs : [...record.crumbs, record.pageTitle],
         category: record.category,
         isPage: record.isPage,
-        titleChunks: highlight(record.isPage ? record.pageTitle : record.heading, matched),
-        snippet: snippet(record.content, matched),
+        titleChunks: highlight(record.isPage ? record.pageTitle : record.heading, matched, key),
+        snippet: snippet(record.content, matched, 160, key),
         score: result.score,
       });
     }
