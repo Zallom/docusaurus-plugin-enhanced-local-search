@@ -24,8 +24,11 @@ const english: Stemmer = (word) => {
   if (w.length > 4 && w.endsWith('ies') && !/[ae]ies$/.test(w)) w = `${w.slice(0, -3)}y`;
   else if (w.length > 3 && w.endsWith('es') && !/[aeo]es$/.test(w)) w = w.slice(0, -1);
   else if (w.length > 3 && w.endsWith('s') && !/[us]s$/.test(w)) w = w.slice(0, -1);
+  const before = w;
   if (w.length > 5 && w.endsWith('ing')) w = w.slice(0, -3);
   else if (w.length > 4 && w.endsWith('ed')) w = w.slice(0, -2);
+  // Consonne doublée par la terminaison (Porter) : banning → bann → ban.
+  if (w !== before && /([^aeiouylsz])\1$/.test(w)) w = w.slice(0, -1);
   if (w.length > 4 && w.endsWith('e')) w = w.slice(0, -1);
   return w;
 };

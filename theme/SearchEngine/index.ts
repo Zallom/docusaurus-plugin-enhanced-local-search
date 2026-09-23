@@ -326,9 +326,19 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
 
       // Précision : « Bannir un utilisateur » est un meilleur titre pour
       // « bannir membre » que « Bannir temporairement un utilisateur ».
-      const titleTerms = new Set(tokenize(record.isPage ? record.pageTitle : record.heading).map(processTerm).filter(Boolean));
-      const covered = [...titleTerms].filter((term) => matched.some(([m]) => m === term)).length;
-      const precision = titleTerms.size ? covered / titleTerms.size : 0;
+      // Compté en mots tels qu'on les lit : « Anti-raid » est un seul mot,
+      // couvert si la requête touche une de ses parties ou sa forme soudée.
+      const matchedSet = new Set(matched.map(([term]) => term));
+      let titleWords = 0;
+      let covered = 0;
+      for (const word of (record.isPage ? record.pageTitle : record.heading).matchAll(TOKEN_RE)) {
+        const parts = word[0].split(/[-'’]/).map(processTerm).filter((part): part is string => Boolean(part));
+        if (!parts.length) continue;
+        titleWords += 1;
+        const joined = word[0].includes('-') ? processTerm(word[0].replace(/[-'’]/g, '')) : null;
+        if (parts.some((part) => matchedSet.has(part)) || (joined && matchedSet.has(joined))) covered += 1;
+      }
+      const precision = titleWords ? covered / titleWords : 0;
 
       const weight = (record.isPage ? 1.2 : 1) * (config.categoryBoosts[record.category] ?? 1);
       const tieBreak = Math.min(0.99, Math.log1p(result.score * weight) / 10);
