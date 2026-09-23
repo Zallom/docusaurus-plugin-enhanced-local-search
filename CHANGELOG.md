@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Fixed: `--lsearch-*` variables redefined on `:root` in a site's CSS were ignored, because the plugin's defaults were loaded after it with the same specificity. The defaults now use `:where(:root)`, so the site always wins.
+
 ## 1.1.1
 
 - New `--lsearch-text-offset` CSS variable: moves the text of the search fields down, for fonts whose letters sit above the middle of their box (the text then looks higher than the magnifier icon).
