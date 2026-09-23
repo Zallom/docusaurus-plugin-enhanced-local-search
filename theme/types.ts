@@ -14,6 +14,8 @@ export interface IndexedPage {
   c: string;
   b: string[];
   s: IndexedSection[];
+  k?: string;
+  p?: number;
 }
 
 export interface SearchIndexFile {

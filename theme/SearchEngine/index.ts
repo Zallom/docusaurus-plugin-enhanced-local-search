@@ -40,6 +40,10 @@ interface SectionRecord {
   title: string;
   /** Champ indexé : contexte (titre de page et fil d'Ariane) pour les sections. */
   context: string;
+  /** Champ indexé : mots-clés ajoutés à la main, sur l'enregistrement de la page. */
+  keywords: string;
+  /** Priorité ajoutée à la main (`customEntries`), sur l'enregistrement de la page. */
+  pin: number;
 }
 
 /** Minuscules sans accents : « Bannissement » et « bannissément » donnent le même terme. */
@@ -191,6 +195,8 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
         isPage,
         title: isPage ? page.t : '',
         context: isPage ? page.b.join(' ') : `${page.t} ${page.b.join(' ')}`,
+        keywords: isPage ? page.k ?? '' : '',
+        pin: isPage ? page.p ?? 0 : 0,
       });
     });
     // Une page sans introduction reste trouvable par son titre.
@@ -208,12 +214,14 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
         isPage: true,
         title: page.t,
         context: page.b.join(' '),
+        keywords: page.k ?? '',
+        pin: page.p ?? 0,
       });
     }
   });
 
   const mini = new MiniSearch<SectionRecord>({
-    fields: ['title', 'heading', 'content', 'context'],
+    fields: ['title', 'keywords', 'heading', 'content', 'context'],
     storeFields: [],
     tokenize,
     processTerm: (term) => {
@@ -228,6 +236,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
   const searchOptions = {
     boost: {
       title: config.boost.title,
+      keywords: config.boost.title,
       heading: config.boost.heading,
       content: config.boost.content,
       context: config.boost.content * 0.6,
@@ -296,7 +305,7 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
     /* Classement par critères successifs, comme Algolia, plutôt que par
      * somme de scores : avec BM25 seul, un mot rare trouvé par préfixe
      * (« raidmode ») écrase un mot courant trouvé tel quel (« raid »).
-     * Ordre : mots trouvés, puis sans faute, puis emplacement (titre avant
+     * Ordre : mots trouvés, puis sans faute, puis priorité manuelle, puis emplacement (titre avant
      * intertitre avant texte), puis exactitude ; BM25 ne sert qu'à départager. */
     const normalizedQuery = normalize(query);
     const termGroups = terms.map((term) => [
@@ -314,17 +323,17 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
       const words = levels.filter((level) => level > 0).length;
       const typoFree = levels.filter((level) => level >= 2).length;
       const exact = levels.filter((level) => level === 3).length;
-      const covers = (field: string) =>
+      const covers = (...wanted: string[]) =>
         termGroups.every(
           (group, i) =>
             levels[i] === 0 ||
-            matched.some(([term, fields]) => fields.includes(field) && matchLevel(term, group) > 0),
+            matched.some(([term, fields]) => fields.some((f) => wanted.includes(f)) && matchLevel(term, group) > 0),
         );
       const title = normalize(record.isPage ? record.pageTitle : record.heading);
       let place = 0;
       if (title === normalizedQuery) place = 4;
-      else if (covers(record.isPage ? 'title' : 'heading')) place = record.isPage ? 3 : 2;
-      else if (covers('title') || covers('heading')) place = 1;
+      else if (record.isPage ? covers('title', 'keywords') : covers('heading')) place = record.isPage ? 3 : 2;
+      else if (covers('title', 'keywords', 'heading')) place = 1;
 
       // Précision : « Bannir un utilisateur » est un meilleur titre pour
       // « bannir membre » que « Bannir temporairement un utilisateur ».
@@ -345,7 +354,9 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
       const weight = (record.isPage ? 1.2 : 1) * (config.categoryBoosts[record.category] ?? 1);
       const tieBreak = Math.min(0.99, Math.log1p(result.score * weight) / 10);
       const priority = config.categoryPriorities?.[record.category] ?? 0;
-      result.score = priority * 1e6 + words * 1e4 + typoFree * 1e3 + place * 1e2 + exact * 10 + precision * 9 + tieBreak;
+      const pin = Math.min(9, Math.max(0, record.pin));
+      result.score =
+        priority * 1e8 + words * 1e6 + typoFree * 1e5 + pin * 1e4 + place * 1e2 + exact * 10 + precision * 9 + tieBreak;
     }
     results.sort((a, b) => b.score - a.score);
 

@@ -44,6 +44,7 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   shortcuts: ['mod+k', '/'],
   recentSearches: 5,
   suggestions: [],
+  customEntries: [],
   searchPagePath: false,
   storageKey: 'local-search',
 };
@@ -78,6 +79,22 @@ const schema = Joi.object<PluginOptions>({
   suggestions: Joi.array()
     .items(Joi.object({label: localized.required(), href: Joi.string().required()}))
     .default(DEFAULT_OPTIONS.suggestions),
+  customEntries: Joi.array()
+    .items(
+      Joi.object({
+        title: localized.required(),
+        url: localized.required(),
+        description: localized,
+        keywords: Joi.alternatives().try(
+          Joi.array().items(Joi.string()),
+          Joi.object().pattern(Joi.string(), Joi.array().items(Joi.string())),
+        ),
+        category: localized,
+        priority: Joi.number().min(0).max(9),
+        locales: Joi.array().items(Joi.string()),
+      }),
+    )
+    .default(DEFAULT_OPTIONS.customEntries),
   searchPagePath: Joi.alternatives().try(Joi.string(), Joi.boolean().valid(false)).default(DEFAULT_OPTIONS.searchPagePath),
   storageKey: Joi.string().default(DEFAULT_OPTIONS.storageKey),
 });

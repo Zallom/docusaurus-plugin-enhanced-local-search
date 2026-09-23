@@ -2,12 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import type {LoadContext, Plugin, SwizzleConfig} from '@docusaurus/types';
 import {buildIndex, joinUrl, type ResolvedCategory} from './indexer/build';
+import {applyCustomEntries, type ResolvedEntry} from './indexer/custom';
 import {DEFAULT_STOP_WORDS} from './stopwords';
 import translations from './translations';
-import type {LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
+import type {CustomEntryOption, LocalizedString, LocalSearchGlobalData, PluginOptions, SearchIndexFile} from './types';
 
 export {validateOptions} from './options';
-export type {PluginOptions, SearchIndexFile, LocalSearchGlobalData} from './types';
+export type {PluginOptions, CustomEntryOption, SearchIndexFile, LocalSearchGlobalData} from './types';
 
 const PLUGIN_NAME = 'docusaurus-plugin-enhanced-local-search';
 
@@ -51,6 +52,25 @@ export default function pluginLocalSearch(
   }));
   const searchPagePath =
     options.searchPagePath === false ? null : `/${options.searchPagePath.replace(/^\/+|\/+$/g, '')}`;
+
+  const defaultCategory = localize(options.defaultCategory);
+  const resolveEntry = (entry: CustomEntryOption): ResolvedEntry => {
+    const target = localize(entry.url);
+    const internal = target.startsWith('/') && !target.startsWith('//');
+    const keywords = Array.isArray(entry.keywords)
+      ? entry.keywords
+      : entry.keywords?.[locale] ?? entry.keywords?.[locale.split('-')[0]] ?? [];
+    return {
+      title: localize(entry.title),
+      url: internal ? joinUrl(baseUrl, target) : target,
+      description: entry.description ? localize(entry.description) : '',
+      keywords,
+      category: entry.category
+        ? localize(entry.category)
+        : (internal && categories.find((cat) => cat.re.test(target.split('#')[0]))?.label) || defaultCategory,
+      priority: entry.priority ?? 1,
+    };
+  };
 
   const themePath = path.resolve(__dirname, '..', 'theme');
 
@@ -143,9 +163,13 @@ export default function pluginLocalSearch(
         siteTitle: siteConfig.title,
         searchPagePath,
         categories,
-        defaultCategory: localize(options.defaultCategory),
+        defaultCategory,
         options,
       });
+      const custom = applyCustomEntries(
+        pages,
+        options.customEntries.filter((entry) => !entry.locales || entry.locales.includes(locale)).map(resolveEntry),
+      );
 
       const index: SearchIndexFile = {v: 1, locale, pages};
       const target = path.join(outDir, options.indexFileName);
@@ -153,7 +177,7 @@ export default function pluginLocalSearch(
       const sections = pages.reduce((n, p) => n + p.s.length, 0);
       const kb = Math.round(fs.statSync(target).size / 1024);
       console.log(
-        `[enhanced-local-search] (${locale}) indexed ${pages.length} pages, ${sections} sections (${kb} KB), skipped ${skipped}.`,
+        `[enhanced-local-search] (${locale}) indexed ${pages.length - custom} pages, ${sections} sections, ${custom} custom entries (${kb} KB), skipped ${skipped}.`,
       );
     },
   };

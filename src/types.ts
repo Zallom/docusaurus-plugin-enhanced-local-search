@@ -17,6 +17,23 @@ export interface SuggestionOption {
   href: string;
 }
 
+/** Entrée ajoutée à la main dans l'index : un lien externe, une action, ou des
+ *  mots-clés en plus sur une page existante. */
+export interface CustomEntryOption {
+  title: LocalizedString;
+  /** Chemin du site (`/docs/setup`, la locale est ajoutée) ou URL absolue. */
+  url: LocalizedString;
+  description?: LocalizedString;
+  /** Mots qui font remonter l'entrée : une liste commune, ou une liste par locale. */
+  keywords?: string[] | Record<string, string[]>;
+  /** Catégorie affichée. Par défaut, celle qui correspond à `url`. */
+  category?: LocalizedString;
+  /** Passe devant les pages aussi pertinentes (1 par défaut, de 0 à 9). */
+  priority?: number;
+  /** Locales où l'entrée existe (toutes par défaut). */
+  locales?: string[];
+}
+
 export interface BoostOptions {
   title: number;
   heading: number;
@@ -46,6 +63,7 @@ export interface PluginOptions {
   shortcuts: string[];
   recentSearches: number;
   suggestions: SuggestionOption[];
+  customEntries: CustomEntryOption[];
   searchPagePath: string | false;
   storageKey: string;
 }
@@ -73,6 +91,10 @@ export interface IndexedPage {
   /** Fil d'Ariane, sans la page elle-même. */
   b: string[];
   s: IndexedSection[];
+  /** Mots-clés ajoutés par `customEntries`. */
+  k?: string;
+  /** Priorité ajoutée par `customEntries`. */
+  p?: number;
 }
 
 export interface SearchIndexFile {
