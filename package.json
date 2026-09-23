@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-plugin-enhanced-local-search",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Local, Algolia-like search for Docusaurus v3: Cmd+K modal, navbar and footer mini bar, big hero search bar, typo-tolerant ranking. No external service.",
   "author": "Zallom <matthias@fca.gg>",
   "license": "MIT",

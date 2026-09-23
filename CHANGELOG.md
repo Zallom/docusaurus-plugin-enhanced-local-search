@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- New `--lsearch-text-offset` CSS variable: moves the text of the search fields down, for fonts whose letters sit above the middle of their box (the text then looks higher than the magnifier icon).
+
 ## 1.1.0
 
 - **Contextual priority**: the category of the page where the search is opened is listed first (`contextualPriority`, on by default). `SearchHero`, `SearchInput` and `openSearch()` accept a `context` to choose it.
