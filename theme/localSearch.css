@@ -1,7 +1,9 @@
 /* Variables de personnalisation. Elles s'appuient sur Infima : sans rien
  * toucher, la recherche prend les couleurs et le thème (clair ou sombre) du
  * site. Pour ajuster, redéfinir une variable dans son propre CSS. */
-:root {
+/* :where() ramène la spécificité à zéro : le :root ou le [data-theme] d'un
+ * site l'emporte, quel que soit l'ordre de chargement des feuilles. */
+:where(:root) {
   --lsearch-accent: var(--ifm-color-primary);
   --lsearch-text: var(--ifm-font-color-base);
   --lsearch-muted: var(--ifm-color-emphasis-600);
@@ -37,7 +39,7 @@
   --lsearch-hero-shadow: 0 12px 48px -16px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--lsearch-border);
 }
 
-[data-theme='dark'] {
+:where([data-theme='dark']) {
   --lsearch-overlay-bg: rgba(0, 0, 0, 0.6);
   --lsearch-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--lsearch-border);
   --lsearch-hero-shadow: 0 12px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--lsearch-border);
