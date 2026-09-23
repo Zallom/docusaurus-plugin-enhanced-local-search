@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.theme.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "theme",
+    "outDir": "lib/theme",
+    "declaration": false,
+    "sourceMap": false,
+    "jsx": "preserve"
+  },
+  "include": [
+    "theme",
+    "theme.d.ts"
+  ]
+}

@@ -20,7 +20,7 @@
     "theme.d.ts"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsc -p tsconfig.theme.build.json && node scripts/copy-theme-assets.mjs && prettier --write --log-level warn --ignore-path .prettierignore lib/theme",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.theme.json",
     "prepublishOnly": "npm run build"
@@ -43,11 +43,11 @@
   },
   "peerDependencies": {
     "@docusaurus/core": "^3.0.0",
-    "@docusaurus/utils-validation": "^3.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "dependencies": {
+    "@docusaurus/utils-validation": "^3.0.0",
     "minisearch": "^7.2.0",
     "node-html-parser": "^9.0.4"
   },
@@ -55,9 +55,9 @@
     "@docusaurus/module-type-aliases": "^3.10.0",
     "@docusaurus/tsconfig": "^3.10.0",
     "@docusaurus/types": "^3.10.0",
-    "@docusaurus/utils-validation": "^3.10.0",
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.0",
+    "prettier": "^3.9.9",
     "tsup": "^8.0.0",
     "typescript": "~5.6.2"
   }

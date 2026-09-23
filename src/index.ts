@@ -75,7 +75,9 @@ export default function pluginLocalSearch(
     };
   };
 
-  const themePath = path.resolve(__dirname, '..', 'theme');
+  // Thème compilé en JavaScript pour le build ; sources TypeScript pour `swizzle --typescript`.
+  const themePath = path.resolve(__dirname, 'theme');
+  const typeScriptThemePath = path.resolve(__dirname, '..', 'theme');
 
   return {
     name: PLUGIN_NAME,
@@ -85,7 +87,7 @@ export default function pluginLocalSearch(
     },
 
     getTypeScriptThemePath() {
-      return themePath;
+      return typeScriptThemePath;
     },
 
     getDefaultCodeTranslationMessages() {
@@ -94,34 +96,6 @@ export default function pluginLocalSearch(
 
     getClientModules() {
       return [path.join(themePath, 'localSearch.css')];
-    },
-
-    configureWebpack() {
-      // Le thème est livré en TypeScript source (pour rester swizzlable) :
-      // Docusaurus ne transpile pas les .ts/.tsx de node_modules par défaut.
-      return {
-        module: {
-          rules: [
-            {
-              test: /\.tsx?$/,
-              include: [themePath],
-              use: [
-                {
-                  loader: require.resolve('babel-loader'),
-                  options: {
-                    babelrc: false,
-                    configFile: false,
-                    presets: [
-                      require.resolve('@babel/preset-typescript'),
-                      [require.resolve('@babel/preset-react'), {runtime: 'automatic'}],
-                    ],
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      };
     },
 
     async contentLoaded({actions}) {
