@@ -152,7 +152,7 @@ export default function pluginLocalSearch(
       const sections = pages.reduce((n, p) => n + p.s.length, 0);
       const kb = Math.round(fs.statSync(target).size / 1024);
       console.log(
-        `[local-search] (${locale}) ${pages.length} pages, ${sections} sections indexées (${kb} Ko), ${skipped} ignorées.`,
+        `[local-search] (${locale}) indexed ${pages.length} pages, ${sections} sections (${kb} KB), skipped ${skipped}.`,
       );
     },
   };
