@@ -9,7 +9,8 @@ Local, Algolia-like search for Docusaurus v3. No external service, no API key, n
 - **Smart without AI**: typo tolerance, prefix search while typing, synonyms, light stemming per language, stop words, accent-insensitive matching, and Algolia-style ranking.
 - **Deep links**: results point to the exact section (`/docs/page#heading`), not just the page.
 - **Custom entries**: add your own results (an invite link, a pricing page, a support server) or extra keywords on existing pages, translated per locale and promoted in the ranking.
-- **i18n**: one index per locale, UI translated in English, French, German, Spanish and Portuguese.
+- **i18n**: one index per locale, UI translated in the 30 languages supported by Discord, word segmentation for Chinese, Japanese and Thai.
+- **Search engines and browsers**: OpenSearch description (search the site from the address bar) and optional schema.org `SearchAction`, both pointing to `/search?q=`.
 - **Fully customizable**: every component can be swizzled, colors come from CSS variables that default to your Infima theme.
 
 ## Requirements
@@ -191,8 +192,8 @@ plugins: [
 | `categories` | Docs, Blog | Result groups. `match` is a regex tested on the page path (without locale prefix). `label` is a string or a per-locale map. `boost` weighs the category to break ties. `priority` (default `0`) is the first ranking criterion: a category with a lower priority always comes after the others, for example `priority: -1` to always list blog posts last. |
 | `defaultCategory` | `'Pages'` | Group of pages matching no category. |
 | `synonyms` | `[]` | Groups of equivalent terms. Multi-word entries are supported. |
-| `stopWords` | built-in per locale | `{locale: [...]}`. Words ignored in queries and in the index, so natural-language questions work. |
-| `stemming` | `true` | Light stemming (en, fr, de, es, pt): `activate`, `activated` and `activates` match each other. |
+| `stopWords` | built-in per locale | `{locale: [...]}`. Words ignored in queries and in the index, so natural-language questions work. A list replaces the built-in one for its locale. |
+| `stemming` | `true` | Light stemming (en, fr, de, es, pt, it, nl): `activate`, `activated` and `activates` match each other. Other languages rely on prefix search and typo tolerance. |
 | `fuzzy` | `0.2` | Typo tolerance, as a fraction of the word length. A wider second pass runs when nothing matches. |
 | `prefix` | `true` | Match word beginnings while typing. |
 | `boost` | `{title: 4, heading: 2.5, content: 1}` | Field weights, used to break ties. |
@@ -203,6 +204,8 @@ plugins: [
 | `suggestions` | `[]` | `[{label, href}]` shown when the search field is empty, in the modal and on the search page. `label` and `href` can be per-locale maps; a site path (`/docs/setup`) gets the locale prefix. |
 | `customEntries` | `[]` | Results added by hand, or extra keywords on existing pages. See [Custom entries](#custom-entries). |
 | `searchPagePath` | `false` | Adds a search page at this path (for example `'search'`). |
+| `openSearch` | `true` | With `searchPagePath`, publishes `opensearch.xml` and links it from every page. `{shortName, description}` (strings or per-locale maps) override the site title and the default description. |
+| `searchAction` | `false` | With `searchPagePath`, adds a schema.org `WebSite` node with a `SearchAction`. `{id}` sets its `@id`, to merge it with a `WebSite` node you already publish. |
 | `ignorePatterns` | `[]` | Regexes on page paths to exclude from the index. |
 | `contentSelectors` | `['.theme-doc-markdown', 'article .markdown', 'article', 'main']` | Where the page content is read, first match wins. |
 | `excludeSelectors` | navigation, buttons, doc cards… | Elements removed before indexing. Replaces the default list. |
@@ -313,7 +316,9 @@ Components import each other through `@theme/`, so a swizzled component is picke
 
 ### Translations
 
-The UI is translated in English, French, German, Spanish and Portuguese. Every string can be overridden in your site's `i18n/<locale>/code.json`, and `docusaurus write-translations` extracts them. Keys start with `localSearch.`.
+The UI is translated in the languages supported by Discord: Bulgarian, Chinese (Simplified and Traditional), Croatian, Czech, Danish, Dutch, English, Finnish, French, German, Greek, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Lithuanian, Norwegian, Polish, Portuguese (Brazil), Romanian, Russian, Spanish, Swedish, Thai, Turkish, Ukrainian and Vietnamese. Regional codes fall back to their language (`es-419` uses Spanish, `nb` uses Norwegian, `zh-Hant` uses Traditional Chinese).
+
+Every string can be overridden in your site's `i18n/<locale>/code.json`, and `docusaurus write-translations` extracts them. Keys start with `localSearch.`.
 
 ## Ranking
 
@@ -344,9 +349,19 @@ plugins: [
 
 If your config does not import the plugin, add the types another way, for example with `import type {} from 'docusaurus-plugin-enhanced-local-search';` in any `.d.ts` or `.ts` file of your site. Without them, TypeScript does not know the `@theme/Search*` modules used by swizzled components.
 
+## Search engines and browsers
+
+With `searchPagePath` set, the search page answers to the usual `?q=` parameter (`/search?q=captcha`), so any link, bookmark or tool can open a search.
+
+- **OpenSearch** (on by default): each locale gets an `opensearch.xml` and every page links to it with `<link rel="search">`. Chrome and Firefox then offer to search your site from the address bar (type the domain, then Tab in Chrome).
+- **`SearchAction`** (off by default): the schema.org action describing the search URL. Google no longer shows the sitelinks search box it was used for (since November 2024), but the markup stays valid for other consumers. If your site already publishes a `WebSite` node, pass its `@id` so both merge instead of competing.
+
+The search page itself is marked `noindex`: search engines ask sites not to index internal search results. Neither feature changes your ranking; they make the search reachable from outside the page.
+
 ## Limitations
 
 - The index only exists on a built site, not with `docusaurus start`.
+- Chinese, Japanese and Thai are split into words with `Intl.Segmenter` (all current browsers). Older browsers fall back to one character per word, which still finds results but ranks them less finely.
 - The search is lexical: it matches words, their variants and your synonyms, not meaning.
 - Pages rendered only on the client (content fetched after load) are not indexed.
 
