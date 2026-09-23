@@ -43,10 +43,11 @@ export default function pluginLocalSearch(
   const locale = i18n.currentLocale;
   const localize = (value: LocalizedString) => resolveLocalized(value, locale, i18n.defaultLocale);
 
-  const categories: (ResolvedCategory & {boost: number})[] = options.categories.map((cat) => ({
+  const categories: (ResolvedCategory & {boost: number; priority: number})[] = options.categories.map((cat) => ({
     re: new RegExp(cat.match),
     label: localize(cat.label),
     boost: cat.boost ?? 1,
+    priority: cat.priority ?? 0,
   }));
   const searchPagePath =
     options.searchPagePath === false ? null : `/${options.searchPagePath.replace(/^\/+|\/+$/g, '')}`;
@@ -114,6 +115,7 @@ export default function pluginLocalSearch(
         stemming: options.stemming,
         boost: options.boost,
         categoryBoosts: Object.fromEntries(categories.map((cat) => [cat.label, cat.boost])),
+        categoryPriorities: Object.fromEntries(categories.map((cat) => [cat.label, cat.priority])),
         maxResults: options.maxResults,
         maxResultsPerPage: options.maxResultsPerPage,
         shortcuts: options.shortcuts,

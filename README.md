@@ -180,7 +180,7 @@ plugins: [
 
 | Option | Default | Description |
 |---|---|---|
-| `categories` | Docs, Blog | Result groups. `match` is a regex tested on the page path (without locale prefix). `label` is a string or a per-locale map. `boost` weighs the category. |
+| `categories` | Docs, Blog | Result groups. `match` is a regex tested on the page path (without locale prefix). `label` is a string or a per-locale map. `boost` weighs the category to break ties. `priority` (default `0`) is the first ranking criterion: a category with a lower priority always comes after the others, for example `priority: -1` to always list blog posts last. |
 | `defaultCategory` | `'Pages'` | Group of pages matching no category. |
 | `synonyms` | `[]` | Groups of equivalent terms. Multi-word entries are supported. |
 | `stopWords` | built-in per locale | `{locale: [...]}`. Words ignored in queries and in the index, so natural-language questions work. |
@@ -269,12 +269,13 @@ The UI is translated in English, French, German, Spanish and Portuguese. Every s
 
 Results are ranked criterion after criterion, like Algolia, rather than by a single additive score:
 
-1. number of query words found;
-2. words found without typos;
-3. where they are found: page title, then section heading, then text;
-4. exact words before prefixes and typos (synonyms count as exact);
-5. precision: a title fully covered by the query ranks above a longer one;
-6. a BM25 relevance score, only to break ties.
+1. category priority, when set;
+2. number of query words found;
+3. words found without typos;
+4. where they are found: page title, then section heading, then text;
+5. exact words before prefixes and typos (synonyms count as exact);
+6. precision: a title fully covered by the query ranks above a longer one;
+7. a BM25 relevance score, only to break ties.
 
 When no page contains every word, the search falls back to pages containing most of them and says so. When nothing matches, it suggests the closest spelling found in your site.
 

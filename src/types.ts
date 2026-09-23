@@ -7,6 +7,9 @@ export interface CategoryOption {
   label: LocalizedString;
   /** Poids appliqué au score des résultats de cette catégorie (1 par défaut). */
   boost?: number;
+  /** Priorité, premier critère de classement (0 par défaut) : une catégorie de
+   *  priorité plus basse passe toujours après les autres. */
+  priority?: number;
 }
 
 export interface SuggestionOption {
@@ -90,6 +93,7 @@ export interface LocalSearchGlobalData {
   stemming: boolean;
   boost: BoostOptions;
   categoryBoosts: Record<string, number>;
+  categoryPriorities: Record<string, number>;
   maxResults: number;
   maxResultsPerPage: number;
   shortcuts: string[];

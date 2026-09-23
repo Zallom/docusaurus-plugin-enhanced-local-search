@@ -190,7 +190,7 @@ export default function SearchHero({
   }
 
   return (
-    <div className={[styles.hero, className ?? ''].filter(Boolean).join(' ')}>
+    <div className={[styles.hero, className ?? ''].filter(Boolean).join(' ')} data-search-ignore>
       {title && <h1 className={styles.title}>{title}</h1>}
       {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       <form

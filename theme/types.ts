@@ -33,6 +33,7 @@ export interface LocalSearchGlobalData {
   stemming: boolean;
   boost: {title: number; heading: number; content: number};
   categoryBoosts: Record<string, number>;
+  categoryPriorities: Record<string, number>;
   maxResults: number;
   maxResultsPerPage: number;
   shortcuts: string[];

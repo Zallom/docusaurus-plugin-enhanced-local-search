@@ -9,6 +9,8 @@ export interface EngineConfig {
   prefix: boolean;
   boost: {title: number; heading: number; content: number};
   categoryBoosts: Record<string, number>;
+  /** Priorité par catégorie, premier critère de classement. */
+  categoryPriorities?: Record<string, number>;
   maxResults: number;
   maxResultsPerPage: number;
   /** Langue du contenu, pour la racinisation. */
@@ -342,7 +344,8 @@ export function createSearchEngine(index: SearchIndexFile, config: EngineConfig)
 
       const weight = (record.isPage ? 1.2 : 1) * (config.categoryBoosts[record.category] ?? 1);
       const tieBreak = Math.min(0.99, Math.log1p(result.score * weight) / 10);
-      result.score = words * 1e4 + typoFree * 1e3 + place * 1e2 + exact * 10 + precision * 9 + tieBreak;
+      const priority = config.categoryPriorities?.[record.category] ?? 0;
+      result.score = priority * 1e6 + words * 1e4 + typoFree * 1e3 + place * 1e2 + exact * 10 + precision * 9 + tieBreak;
     }
     results.sort((a, b) => b.score - a.score);
 

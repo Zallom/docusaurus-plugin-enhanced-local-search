@@ -16,6 +16,7 @@ declare module '@theme/SearchEngine' {
     prefix: boolean;
     boost: {title: number; heading: number; content: number};
     categoryBoosts: Record<string, number>;
+    categoryPriorities?: Record<string, number>;
     maxResults: number;
     maxResultsPerPage: number;
     locale?: string;

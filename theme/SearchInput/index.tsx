@@ -42,7 +42,7 @@ export default function SearchInput({
 
   return (
     <>
-      <div className={classes} onMouseEnter={prefetch}>
+      <div className={classes} onMouseEnter={prefetch} data-search-ignore>
         <button type="button" className={styles.iconButton} aria-label={label} onClick={() => open('')}>
           <SearchIcon width={18} height={18} />
         </button>
