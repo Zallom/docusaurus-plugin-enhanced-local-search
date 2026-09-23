@@ -1,0 +1,63 @@
+{
+  "name": "docusaurus-plugin-local-search",
+  "version": "0.1.0",
+  "description": "Local, Algolia-like search for Docusaurus v3: Cmd+K modal, navbar and footer mini bar, big hero search bar, typo-tolerant ranking. No external service.",
+  "author": "Zallom <matthias@fca.gg>",
+  "license": "MIT",
+  "homepage": "https://github.com/raidprotect/docusaurus-plugin-local-search#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raidprotect/docusaurus-plugin-local-search.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raidprotect/docusaurus-plugin-local-search/issues"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "theme",
+    "theme.d.ts"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.theme.json",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "docusaurus",
+    "docusaurus-plugin",
+    "search",
+    "local-search",
+    "offline-search",
+    "algolia-alternative",
+    "cmdk",
+    "command-palette",
+    "fuzzy-search",
+    "i18n"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "@docusaurus/core": "^3.0.0",
+    "@docusaurus/utils-validation": "^3.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "minisearch": "^7.2.0",
+    "node-html-parser": "^9.0.4"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^3.10.0",
+    "@docusaurus/tsconfig": "^3.10.0",
+    "@docusaurus/types": "^3.10.0",
+    "@docusaurus/utils-validation": "^3.10.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "tsup": "^8.0.0",
+    "typescript": "~5.6.2"
+  }
+}
