@@ -14,7 +14,8 @@ export interface CategoryOption {
 
 export interface SuggestionOption {
   label: LocalizedString;
-  href: string;
+  /** Chemin du site (la locale est ajoutée) ou URL absolue. */
+  href: LocalizedString;
 }
 
 /** Entrée ajoutée à la main dans l'index : un lien externe, une action, ou des

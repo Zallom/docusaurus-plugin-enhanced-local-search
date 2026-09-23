@@ -54,15 +54,18 @@ export default function pluginLocalSearch(
     options.searchPagePath === false ? null : `/${options.searchPagePath.replace(/^\/+|\/+$/g, '')}`;
 
   const defaultCategory = localize(options.defaultCategory);
+  const isInternal = (url: string) => url.startsWith('/') && !url.startsWith('//');
+  /** Chemin du site → URL de la locale courante ; une URL absolue est gardée telle quelle. */
+  const localizeUrl = (url: string) => (isInternal(url) ? joinUrl(baseUrl, url) : url);
   const resolveEntry = (entry: CustomEntryOption): ResolvedEntry => {
     const target = localize(entry.url);
-    const internal = target.startsWith('/') && !target.startsWith('//');
+    const internal = isInternal(target);
     const keywords = Array.isArray(entry.keywords)
       ? entry.keywords
       : entry.keywords?.[locale] ?? entry.keywords?.[locale.split('-')[0]] ?? [];
     return {
       title: localize(entry.title),
-      url: internal ? joinUrl(baseUrl, target) : target,
+      url: localizeUrl(target),
       description: entry.description ? localize(entry.description) : '',
       keywords,
       category: entry.category
@@ -140,7 +143,7 @@ export default function pluginLocalSearch(
         maxResultsPerPage: options.maxResultsPerPage,
         shortcuts: options.shortcuts,
         recentSearches: options.recentSearches,
-        suggestions: options.suggestions.map((s) => ({label: localize(s.label), href: s.href})),
+        suggestions: options.suggestions.map((s) => ({label: localize(s.label), href: localizeUrl(localize(s.href))})),
         searchPagePath,
         storageKey: options.storageKey,
       };

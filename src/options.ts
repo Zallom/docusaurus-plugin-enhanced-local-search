@@ -77,7 +77,7 @@ const schema = Joi.object<PluginOptions>({
   shortcuts: Joi.array().items(Joi.string()).default(DEFAULT_OPTIONS.shortcuts),
   recentSearches: Joi.number().integer().min(0).default(DEFAULT_OPTIONS.recentSearches),
   suggestions: Joi.array()
-    .items(Joi.object({label: localized.required(), href: Joi.string().required()}))
+    .items(Joi.object({label: localized.required(), href: localized.required()}))
     .default(DEFAULT_OPTIONS.suggestions),
   customEntries: Joi.array()
     .items(
