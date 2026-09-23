@@ -55,7 +55,12 @@ export function extractPage(html: string, options: ExtractOptions): ExtractedPag
     .map((item) => clean(item.text))
     .filter((text) => text && text !== title);
 
-  const content = options.contentSelectors.map((sel) => root.querySelector(sel)).find(Boolean) as
+  // Un sélecteur qui désigne plusieurs éléments (des cartes en <article>, par
+  // exemple) ne vise pas le contenu principal : on passe au suivant.
+  const content = (options.contentSelectors
+    .map((sel) => root.querySelectorAll(sel))
+    .find((matches) => matches.length === 1)?.[0] ??
+    options.contentSelectors.map((sel) => root.querySelector(sel)).find(Boolean)) as
     | HTMLElement
     | undefined;
   if (!content) return null;
