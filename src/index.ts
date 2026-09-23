@@ -16,6 +16,8 @@ const safe = {eject: 'safe', wrap: 'safe'} as const;
 export function getSwizzleConfig(): SwizzleConfig {
   return {
     components: {
+      SearchBar: {actions: safe, description: 'Barre de la navbar (élément de navbar `type: \'search\'`).'},
+      SearchInput: {actions: safe, description: 'Mini barre à placer dans la navbar, le footer ou une page.'},
       SearchResult: {actions: safe, description: 'Une ligne de résultat (titre, fil d\'Ariane, extrait).'},
       SearchResults: {actions: safe, description: 'Liste des résultats groupés par catégorie.'},
       SearchModal: {actions: {eject: 'unsafe', wrap: 'safe'}, description: 'La fenêtre de recherche (Cmd+K).'},

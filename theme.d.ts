@@ -155,3 +155,21 @@ declare module '@theme/SearchModalHost' {
 
   export default function SearchModalHost(): ReactNode;
 }
+
+declare module '@theme/SearchInput' {
+  import type {ReactNode} from 'react';
+
+  export interface SearchInputProps {
+    placeholder?: string;
+    className?: string;
+    showShortcut?: boolean;
+    variant?: 'default' | 'navbar';
+  }
+  export default function SearchInput(props: SearchInputProps): ReactNode;
+}
+
+declare module '@theme/SearchBar' {
+  import type {ReactNode} from 'react';
+
+  export default function SearchBar(): ReactNode;
+}
