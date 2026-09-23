@@ -7,16 +7,18 @@ export interface ResolvedEntry {
   keywords: string[];
   category: string;
   priority: number;
+  standalone: boolean;
 }
 
 const stripSlash = (p: string) => (p.length > 1 ? p.replace(/\/$/, '') : p);
 
 /* Une entrée qui pointe vers une page déjà indexée lui ajoute ses mots-clés
- * (et son titre, s'il diffère) au lieu de créer un doublon. */
+ * (et son titre, s'il diffère) au lieu de créer un doublon, sauf si elle est
+ * `standalone` : elle reste alors un résultat à part, dans sa propre catégorie. */
 export function applyCustomEntries(pages: IndexedPage[], entries: ResolvedEntry[]): number {
   let added = 0;
   for (const entry of entries) {
-    const existing = pages.find((page) => stripSlash(page.u) === stripSlash(entry.url));
+    const existing = entry.standalone ? undefined : pages.find((page) => stripSlash(page.u) === stripSlash(entry.url));
     if (existing) {
       const words = [...entry.keywords];
       if (entry.title !== existing.t) words.push(entry.title);
