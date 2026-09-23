@@ -333,6 +333,10 @@ The search uses your Infima variables by default. Override any of these in your 
   --lsearch-bar-height: 36px;
   --lsearch-bar-width: 12rem;
 
+  /* Moves the text of the fields down, for fonts whose letters sit above
+   * the middle of their box (try 1px if the text looks higher than the icon). */
+  --lsearch-text-offset: 0px;
+
   --lsearch-hero-radius: 28px;
   --lsearch-hero-bg: var(--ifm-background-surface-color);
   --lsearch-hero-shadow: 0 12px 48px -16px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--lsearch-border);

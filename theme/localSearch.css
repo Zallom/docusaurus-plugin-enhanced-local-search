@@ -28,6 +28,9 @@
   --lsearch-bar-radius: 999px;
   --lsearch-bar-height: 36px;
   --lsearch-bar-width: 12rem;
+  /* Décale le texte des champs vers le bas, pour les polices dont les lettres
+   * sont dessinées plus haut que le centre de leur boîte (ex. 1px). */
+  --lsearch-text-offset: 0px;
 
   --lsearch-hero-radius: 28px;
   --lsearch-hero-bg: var(--ifm-background-surface-color, #fff);

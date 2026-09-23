@@ -44,6 +44,8 @@
 .input {
   flex: 1;
   min-width: 0;
+  position: relative;
+  top: var(--lsearch-text-offset);
   height: 100%;
   border: 0;
   outline: 0;
