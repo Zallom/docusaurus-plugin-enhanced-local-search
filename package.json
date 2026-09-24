@@ -4,7 +4,7 @@
   "description": "Local / Offline, typo-tolerant search for Docusaurus v3: ⌘K modal, hero search bar, synonyms and 30 UI languages.",
   "author": "Zallom <matthias@fca.gg>",
   "license": "MIT",
-  "homepage": "https://github.com/Zallom/docusaurus-plugin-enhanced-local-search#readme",
+  "homepage": "https://zallom.github.io/docusaurus-plugin-enhanced-local-search/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zallom/docusaurus-plugin-enhanced-local-search.git"
