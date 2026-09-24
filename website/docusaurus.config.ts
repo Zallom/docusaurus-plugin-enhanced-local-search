@@ -6,6 +6,9 @@ import type {PluginOptions as SearchOptions} from 'docusaurus-plugin-enhanced-lo
 const repo = 'https://github.com/Zallom/docusaurus-plugin-enhanced-local-search';
 const npm = 'https://www.npmjs.com/package/docusaurus-plugin-enhanced-local-search';
 const links = {en: 'Links', fr: 'Liens', ja: 'リンク'};
+// Docusaurus loads the config once per locale: RaidProtect's French site is at
+// the root, its English one under /en.
+const raidprotect = process.env.DOCUSAURUS_CURRENT_LOCALE === 'fr' ? 'https://raidprotect.bot' : 'https://raidprotect.bot/en';
 
 const config: Config = {
   title: 'Enhanced Local Search',
@@ -135,7 +138,7 @@ const config: Config = {
         {
           title: 'Showcase',
           items: [
-            {label: 'RaidProtect', href: 'https://raidprotect.bot'},
+            {label: 'RaidProtect', href: raidprotect},
             {label: 'Discord FR', href: 'https://dfr.gg'},
           ],
         },

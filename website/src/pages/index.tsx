@@ -1,6 +1,7 @@
 import React, {type ReactNode} from 'react';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import Translate, {translate} from '@docusaurus/Translate';
 import CodeBlock from '@theme/CodeBlock';
@@ -54,11 +55,12 @@ function getFeatures() {
   ];
 }
 
-function getShowcase() {
+// RaidProtect has a French site at the root and an English one under /en.
+function getShowcase(locale: string) {
   return [
     {
       name: 'RaidProtect',
-      url: 'https://raidprotect.bot/docs',
+      url: locale === 'fr' ? 'https://raidprotect.bot/docs' : 'https://raidprotect.bot/en/docs',
       image: '/img/showcase/raidprotect.jpg',
       description: translate({
         id: 'home.showcase.raidprotect',
@@ -93,6 +95,9 @@ function ShowcaseCard({name, url, image, description}: ReturnType<typeof getShow
 
 export default function Home(): ReactNode {
   const features = getFeatures();
+  const {
+    i18n: {currentLocale},
+  } = useDocusaurusContext();
   return (
     <Layout
       title={translate({id: 'home.title', message: 'Local search for Docusaurus'})}
@@ -151,7 +156,7 @@ export default function Home(): ReactNode {
             <Translate id="home.showcase.intro">Sites using the plugin in production.</Translate>
           </p>
           <div className={styles.showcaseGrid}>
-            {getShowcase().map((site) => (
+            {getShowcase(currentLocale).map((site) => (
               <ShowcaseCard key={site.name} {...site} />
             ))}
           </div>
