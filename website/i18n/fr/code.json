@@ -21,7 +21,7 @@
     "message": "Selon le contexte"
   },
   "home.feature.context.text": {
-    "message": "Une recherche ouverte depuis le blog affiche d'abord les articles. Les liens rapides restent en tête quand il le faut."
+    "message": "Une recherche ouverte depuis le journal des modifications affiche d'abord les notes de version. Les liens rapides restent en tête quand il le faut."
   },
   "home.feature.i18n.title": {
     "message": "30 langues d'interface"

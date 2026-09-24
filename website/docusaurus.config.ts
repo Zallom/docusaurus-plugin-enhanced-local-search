@@ -39,7 +39,7 @@ const config: Config = {
       {
         categories: [
           {id: 'docs', match: '^/docs(/|$)', label: {en: 'Documentation', fr: 'Documentation', ja: 'ドキュメント'}, priority: 2},
-          {id: 'blog', match: '^/blog(/|$)', label: {en: 'Blog', fr: 'Blog', ja: 'ブログ'}, priority: 1},
+          {id: 'changelog', match: '^/changelog(/|$)', label: {en: 'Changelog', fr: 'Journal des modifications', ja: '変更履歴'}, priority: 1},
           {id: 'links', label: links, priority: 10},
         ],
         defaultCategory: {en: 'Pages', fr: 'Pages', ja: 'ページ'},
@@ -67,9 +67,10 @@ const config: Config = {
           },
           {
             title: {en: 'Changelog', fr: 'Journal des modifications', ja: '変更履歴'},
-            url: `${repo}/blob/main/CHANGELOG.md`,
+            url: '/changelog',
             keywords: {en: ['release', 'version', 'what is new'], fr: ['version', 'nouveautés'], ja: ['リリース', 'バージョン']},
             category: links,
+            standalone: true,
           },
         ],
         suggestions: [
@@ -92,12 +93,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           editUrl: `${repo}/edit/main/website/`,
         },
-        blog: {
-          showReadingTime: true,
-          editUrl: `${repo}/edit/main/website/`,
-          onInlineAuthors: 'ignore',
-          onUntruncatedBlogPosts: 'ignore',
-        },
+        blog: false,
         theme: {customCss: './src/css/custom.css'},
       } satisfies Preset.Options,
     ],
@@ -110,7 +106,7 @@ const config: Config = {
       logo: {alt: 'Enhanced Local Search', src: 'img/logo.svg'},
       items: [
         {type: 'docSidebar', sidebarId: 'docs', position: 'left', label: 'Docs'},
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {to: '/changelog', label: 'Changelog', position: 'left'},
         {type: 'search', position: 'right'},
         {type: 'localeDropdown', position: 'right'},
         {href: repo, label: 'GitHub', position: 'right'},
@@ -132,7 +128,7 @@ const config: Config = {
           items: [
             {label: 'GitHub', href: repo},
             {label: 'npm', href: npm},
-            {label: 'Changelog', href: `${repo}/blob/main/CHANGELOG.md`},
+            {label: 'Changelog', to: '/changelog'},
           ],
         },
         {

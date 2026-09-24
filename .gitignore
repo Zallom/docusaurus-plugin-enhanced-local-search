@@ -4,3 +4,4 @@ lib/
 .DS_Store
 build/
 .docusaurus/
+website/src/pages/changelog.md
