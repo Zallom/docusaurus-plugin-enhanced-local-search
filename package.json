@@ -35,13 +35,10 @@
     "local-search",
     "offline-search",
     "full-text-search",
-    "cmdk",
-    "command-palette",
     "search-bar",
+    "command-palette",
     "typo-tolerance",
-    "fuzzy-search",
-    "synonyms",
-    "i18n"
+    "fuzzy-search"
   ],
   "engines": {
     "node": ">=18.0.0"
