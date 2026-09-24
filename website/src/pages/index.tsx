@@ -35,7 +35,7 @@ function getFeatures() {
     title: translate({id: 'home.feature.context.title', message: 'Context aware'}),
     text: translate({
       id: 'home.feature.context.text',
-      message: 'A search opened from the blog lists blog posts first. Quick links stay on top when you need them.',
+      message: 'A search opened from the changelog lists release notes first. Quick links stay on top when you need them.',
     }),
   },
   {

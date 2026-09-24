@@ -11,12 +11,12 @@
     "message": "ドキュメント",
     "description": "Navbar item with label Docs"
   },
-  "item.label.Blog": {
-    "message": "ブログ",
-    "description": "Navbar item with label Blog"
-  },
   "item.label.GitHub": {
     "message": "GitHub",
     "description": "Navbar item with label GitHub"
+  },
+  "item.label.Changelog": {
+    "message": "変更履歴",
+    "description": "Navbar item with label Changelog"
   }
 }
