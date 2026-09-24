@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fixed: the blog archive page was indexed. Docusaurus gives it no specific class, so any blog page that is not a post is now treated as a listing and skipped.
+- npm description and keywords reworded; the package homepage points to the live demo.
+
 ## 1.2.0
 
 - Custom entries accept `standalone: true`: the entry stays a separate result even when its `url` is an indexed page, instead of giving its keywords to that page. Useful for a quick link on top of the results while the page itself is indexed in its own category.

@@ -29,6 +29,14 @@ export interface BuildIndexResult {
 // pages qu'elles listent et pollueraient les résultats.
 const LISTING_CLASS = /(^|\s)(blog-list-page|blog-tags-list-page|blog-tags-post-list-page|blog-archive-page|blog-authors-list-page|blog-authors-posts-page|docs-tags-list-page|docs-tags-doc-list-page)(\s|$)/;
 
+/* Une page du blog qui n'est pas un article est une liste : la page d'archives
+ * n'a aucune classe à elle (Docusaurus 3.10). */
+function isListingPage(htmlClass: string): boolean {
+  if (LISTING_CLASS.test(htmlClass)) return true;
+  const classes = htmlClass.split(/\s+/);
+  return classes.includes('plugin-blog') && !classes.includes('blog-post-page');
+}
+
 function walkHtml(dir: string): string[] {
   const out: string[] = [];
   if (!fs.existsSync(dir)) return out;
@@ -89,7 +97,7 @@ export function buildIndex(input: BuildIndexInput): BuildIndexResult {
     const url = joinUrl(input.baseUrl, route);
     if (
       !page ||
-      LISTING_CLASS.test(page.htmlClass) ||
+      isListingPage(page.htmlClass) ||
       (options.respectNoindex && page.noindex) ||
       (options.onlyCanonical && page.canonical && !isCanonical(page.canonical, url))
     ) {
