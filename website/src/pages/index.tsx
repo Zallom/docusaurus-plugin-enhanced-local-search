@@ -1,5 +1,6 @@
 import React, {type ReactNode} from 'react';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import Translate, {translate} from '@docusaurus/Translate';
 import CodeBlock from '@theme/CodeBlock';
@@ -51,6 +52,43 @@ function getFeatures() {
     }),
   },
   ];
+}
+
+function getShowcase() {
+  return [
+    {
+      name: 'RaidProtect',
+      url: 'https://raidprotect.bot/docs',
+      image: '/img/showcase/raidprotect.jpg',
+      description: translate({
+        id: 'home.showcase.raidprotect',
+        message:
+          'Documentation, glossary and blog of a Discord protection bot, in five languages. Hero bar on the docs home, contextual priority and quick links.',
+      }),
+    },
+    {
+      name: 'Discord FR',
+      url: 'https://dfr.gg',
+      image: '/img/showcase/dfr.jpg',
+      description: translate({
+        id: 'home.showcase.dfr',
+        message: 'The French-speaking Discord community: news, wiki and help, searchable from the hero bar of the home page.',
+      }),
+    },
+  ];
+}
+
+function ShowcaseCard({name, url, image, description}: ReturnType<typeof getShowcase>[number]): ReactNode {
+  return (
+    <Link href={url} className={styles.showcaseCard}>
+      <img src={useBaseUrl(image)} alt={name} loading="lazy" width={1200} height={660} className={styles.showcaseImage} />
+      <div className={styles.showcaseBody}>
+        <h3 className={styles.showcaseName}>{name}</h3>
+        <p className={styles.showcaseText}>{description}</p>
+        <span className={styles.showcaseUrl}>{url.replace(/^https:\/\//, '')}</span>
+      </div>
+    </Link>
+  );
 }
 
 export default function Home(): ReactNode {
@@ -105,15 +143,18 @@ export default function Home(): ReactNode {
           </div>
         </section>
 
-        <section className={`container margin-bottom--xl ${styles.production}`}>
-          <h2>
-            <Translate id="home.production.title">Used in production</Translate>
+        <section className={`container margin-bottom--xl ${styles.showcase}`}>
+          <h2 className={styles.showcaseTitle}>
+            <Translate id="home.showcase.title">Showcase</Translate>
           </h2>
-          <p>
-            <Link href="https://raidprotect.bot">RaidProtect</Link>
-            {' · '}
-            <Link href="https://dfr.gg">Discord FR</Link>
+          <p className={styles.showcaseIntro}>
+            <Translate id="home.showcase.intro">Sites using the plugin in production.</Translate>
           </p>
+          <div className={styles.showcaseGrid}>
+            {getShowcase().map((site) => (
+              <ShowcaseCard key={site.name} {...site} />
+            ))}
+          </div>
         </section>
       </main>
     </Layout>

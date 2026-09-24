@@ -30,7 +30,7 @@ Docusaurus v3 向けの、タイプミスに強いローカル／オフライン
 
 自動的に除外されるもの：404 ページ、`noindex` のページ、正規 URL が別の場所を指すページ（重複したドキュメントのバージョン）、Docusaurus が生成する一覧ページ（ブログ一覧、タグ、アーカイブ、著者）。
 
-## 本番環境での利用
+## 導入事例
 
 - [RaidProtect](https://raidprotect.bot)：Discord の保護ボットのドキュメント、用語集、ブログ（5 言語）。
 - [Discord FR](https://dfr.gg)：フランス語圏の Discord コミュニティ。

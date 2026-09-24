@@ -68,9 +68,6 @@
   "home.cta.options": {
     "message": "すべてのオプション"
   },
-  "home.production.title": {
-    "message": "本番環境での利用"
-  },
   "theme.ErrorPageContent.title": {
     "message": "エラーが発生しました",
     "description": "The title of the fallback page when the page crashed"
@@ -497,5 +494,17 @@
   "theme.tags.tagsPageTitle": {
     "message": "タグ",
     "description": "The title of the tag list page"
+  },
+  "home.showcase.title": {
+    "message": "導入事例"
+  },
+  "home.showcase.intro": {
+    "message": "本番環境でこのプラグインを使っているサイト。"
+  },
+  "home.showcase.raidprotect": {
+    "message": "Discord の保護ボットのドキュメント、用語集、ブログ（5 言語）。ドキュメントのトップに大きな検索バー、コンテキスト優先度、クイックリンク。"
+  },
+  "home.showcase.dfr": {
+    "message": "フランス語圏の Discord コミュニティ。ニュース、Wiki、サポートを、トップページの大きな検索バーから検索できます。"
   }
 }

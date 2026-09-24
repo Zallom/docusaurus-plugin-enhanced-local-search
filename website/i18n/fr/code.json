@@ -68,9 +68,6 @@
   "home.cta.options": {
     "message": "Toutes les options"
   },
-  "home.production.title": {
-    "message": "Utilisé en production"
-  },
   "theme.ErrorPageContent.title": {
     "message": "Cette page a planté.",
     "description": "The title of the fallback page when the page crashed"
@@ -497,5 +494,17 @@
   "theme.tags.tagsPageTitle": {
     "message": "Tags",
     "description": "The title of the tag list page"
+  },
+  "home.showcase.title": {
+    "message": "Ils l'utilisent"
+  },
+  "home.showcase.intro": {
+    "message": "Des sites qui utilisent le plugin en production."
+  },
+  "home.showcase.raidprotect": {
+    "message": "Documentation, glossaire et blog d'un bot Discord de protection, en cinq langues. Grande barre sur l'accueil de la doc, priorité contextuelle et liens rapides."
+  },
+  "home.showcase.dfr": {
+    "message": "La communauté francophone de Discord : actualités, wiki et entraide, à chercher depuis la grande barre de la page d'accueil."
   }
 }

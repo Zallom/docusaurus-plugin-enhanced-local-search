@@ -30,7 +30,7 @@ L'index est téléchargé à la demande, la première fois qu'une barre de reche
 
 Ignorées automatiquement : les pages 404, les pages `noindex`, les pages dont l'URL canonique pointe ailleurs (versions de doc dupliquées) et les pages de listes générées par Docusaurus (listes du blog, tags, archives, auteurs).
 
-## Utilisé en production
+## Ils l'utilisent
 
 - [RaidProtect](https://raidprotect.bot) : documentation, glossaire et blog d'un bot Discord de protection, en 5 langues.
 - [Discord FR](https://dfr.gg) : la communauté francophone de Discord.
