@@ -32,5 +32,5 @@ Skipped automatically: 404 pages, `noindex` pages, pages whose canonical URL poi
 
 ## Showcase
 
-- [RaidProtect](https://raidprotect.bot): documentation, glossary and blog of a Discord protection bot, in 5 languages.
+- [RaidProtect](https://raidprotect.bot/en): documentation, glossary and blog of a Discord protection bot, in 5 languages.
 - [Discord FR](https://dfr.gg): the French-speaking Discord community.

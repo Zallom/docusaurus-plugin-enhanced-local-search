@@ -4,7 +4,7 @@ title: Introducing Enhanced Local Search
 tags: [release]
 ---
 
-We built this plugin for the documentation of [RaidProtect](https://raidprotect.bot), a Discord protection bot translated into five languages. We wanted the feel of a hosted search (a ⌘K modal, forgiving typos, the right page first) without sending our content to a third-party service.
+We built this plugin for the documentation of [RaidProtect](https://raidprotect.bot/en), a Discord protection bot translated into five languages. We wanted the feel of a hosted search (a ⌘K modal, forgiving typos, the right page first) without sending our content to a third-party service.
 
 <!-- truncate -->
 

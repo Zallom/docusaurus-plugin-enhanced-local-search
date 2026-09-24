@@ -32,5 +32,5 @@ Docusaurus v3 向けの、タイプミスに強いローカル／オフライン
 
 ## 導入事例
 
-- [RaidProtect](https://raidprotect.bot)：Discord の保護ボットのドキュメント、用語集、ブログ（5 言語）。
+- [RaidProtect](https://raidprotect.bot/en)：Discord の保護ボットのドキュメント、用語集、ブログ（5 言語）。
 - [Discord FR](https://dfr.gg)：フランス語圏の Discord コミュニティ。
