@@ -4,7 +4,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import Translate, {translate} from '@docusaurus/Translate';
-import CodeBlock from '@theme/CodeBlock';
+import InstallCommand from '@site/src/components/InstallCommand';
 import SearchHero from '@theme/SearchHero';
 import styles from './index.module.css';
 
@@ -124,7 +124,7 @@ export default function Home(): ReactNode {
               ]}
             />
             <div className={styles.install}>
-              <CodeBlock language="bash">npm install docusaurus-plugin-enhanced-local-search</CodeBlock>
+              <InstallCommand />
             </div>
             <div className={styles.buttons}>
               <Link className="button button--primary button--lg" to="/docs/getting-started">

@@ -3,6 +3,8 @@ title: "Getting started"
 sidebar_position: 2
 ---
 
+import InstallCommand from '@site/src/components/InstallCommand';
+
 ## Requirements
 
 - Docusaurus 3
@@ -11,9 +13,7 @@ sidebar_position: 2
 
 ## Installation
 
-```bash
-npm install docusaurus-plugin-enhanced-local-search
-```
+<InstallCommand />
 
 ```js
 // docusaurus.config.js
