@@ -1,7 +1,7 @@
 {
   "name": "docusaurus-plugin-enhanced-local-search",
   "version": "1.2.0",
-  "description": "Local, Algolia-like search for Docusaurus v3: Cmd+K modal, navbar and footer mini bar, big hero search bar, typo-tolerant ranking. No external service.",
+  "description": "Local / Offline, typo-tolerant search for Docusaurus v3: ⌘K modal, hero search bar, synonyms and 30 UI languages.",
   "author": "Zallom <matthias@fca.gg>",
   "license": "MIT",
   "homepage": "https://github.com/Zallom/docusaurus-plugin-enhanced-local-search#readme",
@@ -29,15 +29,16 @@
   "keywords": [
     "docusaurus",
     "docusaurus-plugin",
+    "docusaurus-theme",
+    "docusaurus-v3",
     "search",
     "local-search",
-    "enhanced-search",
     "offline-search",
-    "algolia-alternative",
-    "cmdk",
+    "full-text-search",
+    "search-bar",
     "command-palette",
-    "fuzzy-search",
-    "i18n"
+    "typo-tolerance",
+    "fuzzy-search"
   ],
   "engines": {
     "node": ">=18.0.0"
