@@ -1,0 +1,44 @@
+.hero {
+  padding: 5rem 0 3rem;
+  text-align: center;
+}
+
+.install {
+  max-width: 34rem;
+  margin: 2rem auto 0;
+  text-align: left;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 20px;
+}
+
+.card {
+  padding: 22px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 14px;
+  background: var(--ifm-background-surface-color);
+}
+
+.cardTitle {
+  margin-bottom: 8px;
+  font-size: 1.15rem;
+}
+
+.cardText {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.production {
+  text-align: center;
+}
