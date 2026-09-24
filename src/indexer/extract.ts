@@ -30,6 +30,9 @@ const BLOCK_TAGS = new Set([
 
 const clean = (text: string) => text.replace(/[​-‍﻿]/g, '').replace(/\s+/g, ' ').trim();
 
+/** Texte d'un titre : un <br> vaut une espace (« Bien plus qu'un bot :<br>votre partenaire »). */
+const headingText = (el: HTMLElement) => clean(parse(el.innerHTML.replace(/<br\s*\/?>/gi, ' ')).text);
+
 export function extractPage(html: string, options: ExtractOptions): ExtractedPage | null {
   const root = parse(html, {
     comment: false,
@@ -47,7 +50,7 @@ export function extractPage(html: string, options: ExtractOptions): ExtractedPag
   const h1 = scope.querySelector('h1');
   const titleTag = clean(root.querySelector('title')?.text ?? '');
   const suffix = new RegExp(`\\s*[|·–-]\\s*${options.siteTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`);
-  const title = clean(h1?.text ?? '') || titleTag.replace(suffix, '');
+  const title = (h1 ? headingText(h1) : '') || titleTag.replace(suffix, '');
   if (!title) return null;
 
   const breadcrumbs = root
@@ -55,7 +58,12 @@ export function extractPage(html: string, options: ExtractOptions): ExtractedPag
     .map((item) => clean(item.text))
     .filter((text) => text && text !== title);
 
-  const content = options.contentSelectors.map((sel) => root.querySelector(sel)).find(Boolean) as
+  // Un sélecteur qui désigne plusieurs éléments (des cartes en <article>, par
+  // exemple) ne vise pas le contenu principal : on passe au suivant.
+  const content = (options.contentSelectors
+    .map((sel) => root.querySelectorAll(sel))
+    .find((matches) => matches.length === 1)?.[0] ??
+    options.contentSelectors.map((sel) => root.querySelector(sel)).find(Boolean)) as
     | HTMLElement
     | undefined;
   if (!content) return null;
@@ -85,7 +93,7 @@ export function extractPage(html: string, options: ExtractOptions): ExtractedPag
     const tag = (el.rawTagName ?? '').toLowerCase();
     if (headingTags.has(tag)) {
       flush();
-      current = {a: el.getAttribute('id') ?? null, h: clean(el.text) || null, parts: []};
+      current = {a: el.getAttribute('id') ?? null, h: headingText(el) || null, parts: []};
       return;
     }
     const block = BLOCK_TAGS.has(tag);

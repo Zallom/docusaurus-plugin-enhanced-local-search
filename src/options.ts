@@ -103,6 +103,7 @@ const schema = Joi.object<PluginOptions>({
         category: localized,
         priority: Joi.number().min(0).max(9),
         locales: Joi.array().items(Joi.string()),
+        standalone: Joi.boolean(),
       }),
     )
     .default(DEFAULT_OPTIONS.customEntries),

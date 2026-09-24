@@ -76,6 +76,7 @@ export default function pluginLocalSearch(
         ? localize(entry.category)
         : (internal && categories.find((cat) => cat.re?.test(target.split('#')[0]))?.label) || defaultCategory,
       priority: entry.priority ?? 1,
+      standalone: entry.standalone ?? false,
     };
   };
 

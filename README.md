@@ -211,7 +211,7 @@ plugins: [
 | `openSearch` | `true` | With `searchPagePath`, publishes `opensearch.xml` and links it from every page. `{shortName, description}` (strings or per-locale maps) override the site title and the default description. |
 | `searchAction` | `false` | With `searchPagePath`, adds a schema.org `WebSite` node with a `SearchAction`. `{id}` sets its `@id`, to merge it with a `WebSite` node you already publish. |
 | `ignorePatterns` | `[]` | Regexes on page paths to exclude from the index. |
-| `contentSelectors` | `['.theme-doc-markdown', 'article .markdown', 'article', 'main']` | Where the page content is read, first match wins. |
+| `contentSelectors` | `['.theme-doc-markdown', 'article .markdown', 'article', 'main']` | Where the page content is read: the first selector matching exactly one element wins (a selector matching several elements, like cards in `<article>` tags, is skipped). |
 | `excludeSelectors` | navigation, buttons, doc cards… | Elements removed before indexing. Replaces the default list. |
 | `headingLevels` | `[2, 3]` | Headings that start a new section. |
 | `maxSectionLength` | `1500` | Characters kept per section. |
@@ -254,10 +254,11 @@ With this configuration, typing "add" (or "ajouter" on the French site) lists "A
 | `category` | string or per-locale map | Group of the result. Defaults to the category matching `url`, then `defaultCategory`. |
 | `priority` | `0` to `9`, default `1` | Ranks the entry above pages that match the query just as well. It never lifts an entry above a result matching more of the query words. |
 | `locales` | `string[]` | Locales where the entry exists. All by default. |
+| `standalone` | `boolean` | Keep the entry as a separate result even when `url` is an indexed page. Default `false`: the page gets the keywords instead. |
 
 Only the title and the keywords of an entry are searched: its description is shown under the title but does not match queries, so a description mentioning your product name does not surface the entry on every search.
 
-When `url` is a page that is already indexed, no duplicate is created: the page gets the keywords (and the entry's title, if different) and the priority.
+When `url` is a page that is already indexed, no duplicate is created: the page gets the keywords (and the entry's title, if different) and the priority. Set `standalone: true` to keep the entry as its own result instead, for example a "Pricing" quick link on top of the results while the pricing page itself is indexed in its own category.
 
 Custom entries are added after `ignorePatterns` is applied, so they can point to pages you keep out of the index.
 

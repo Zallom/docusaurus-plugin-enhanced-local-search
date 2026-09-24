@@ -36,6 +36,8 @@ export interface CustomEntryOption {
   priority?: number;
   /** Locales où l'entrée existe (toutes par défaut). */
   locales?: string[];
+  /** Reste un résultat à part même si `url` est une page indexée (sinon, la page reçoit ses mots-clés). */
+  standalone?: boolean;
 }
 
 export interface BoostOptions {
