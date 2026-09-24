@@ -133,7 +133,7 @@ const config: Config = {
           ],
         },
         {
-          title: 'Used in production',
+          title: 'Showcase',
           items: [
             {label: 'RaidProtect', href: 'https://raidprotect.bot'},
             {label: 'Discord FR', href: 'https://dfr.gg'},
