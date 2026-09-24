@@ -3,6 +3,8 @@ title: "インストール"
 sidebar_position: 2
 ---
 
+import InstallCommand from '@site/src/components/InstallCommand';
+
 ## 動作環境
 
 - Docusaurus 3
@@ -11,9 +13,7 @@ sidebar_position: 2
 
 ## インストール
 
-```bash
-npm install docusaurus-plugin-enhanced-local-search
-```
+<InstallCommand />
 
 ```js
 // docusaurus.config.js
