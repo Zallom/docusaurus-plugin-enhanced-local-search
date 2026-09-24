@@ -1,0 +1,50 @@
+{
+  "link.title.Docs": {
+    "message": "Docs",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Project": {
+    "message": "Projet",
+    "description": "The title of the footer links column with title=Project in the footer"
+  },
+  "link.title.Used in production": {
+    "message": "Utilisé en production",
+    "description": "The title of the footer links column with title=Used in production in the footer"
+  },
+  "link.item.label.Getting started": {
+    "message": "Premiers pas",
+    "description": "The label of footer link with label=Getting started linking to /docs/getting-started"
+  },
+  "link.item.label.Options": {
+    "message": "Options",
+    "description": "The label of footer link with label=Options linking to /docs/options"
+  },
+  "link.item.label.Components": {
+    "message": "Composants",
+    "description": "The label of footer link with label=Components linking to /docs/components/search-hero"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/Zallom/docusaurus-plugin-enhanced-local-search"
+  },
+  "link.item.label.npm": {
+    "message": "npm",
+    "description": "The label of footer link with label=npm linking to https://www.npmjs.com/package/docusaurus-plugin-enhanced-local-search"
+  },
+  "link.item.label.Changelog": {
+    "message": "Journal des modifications",
+    "description": "The label of footer link with label=Changelog linking to https://github.com/Zallom/docusaurus-plugin-enhanced-local-search/blob/main/CHANGELOG.md"
+  },
+  "link.item.label.RaidProtect": {
+    "message": "RaidProtect",
+    "description": "The label of footer link with label=RaidProtect linking to https://raidprotect.bot"
+  },
+  "link.item.label.Discord FR": {
+    "message": "Discord FR",
+    "description": "The label of footer link with label=Discord FR linking to https://dfr.gg"
+  },
+  "copyright": {
+    "message": "Licence MIT. Construit avec Docusaurus et ce plugin.",
+    "description": "The footer copyright"
+  }
+}

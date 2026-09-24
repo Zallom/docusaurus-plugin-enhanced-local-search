@@ -1,0 +1,14 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.docs.category.Components": {
+    "message": "Composants",
+    "description": "The label for category 'Components' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Customization": {
+    "message": "Personnalisation",
+    "description": "The label for category 'Customization' in sidebar 'docs'"
+  }
+}
